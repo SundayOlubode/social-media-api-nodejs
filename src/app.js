@@ -6,12 +6,6 @@ const errorMiddleware = require("./middlewares/error");
 const app = express();
 
 
-if (process.env.NODE_ENV !== "production") {
-    require("dotenv").config({
-        path: "backend/config/config.env"
-    });
-}
-
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -12,7 +12,15 @@ process.on("uncaughtException", err => {
         process.exit(1);
     })
 
-})
+});
+
+
+// Config
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config({
+        path: "src/config/config.env"
+    });
+}
 
 
 // Connecting to DB
