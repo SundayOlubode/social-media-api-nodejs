@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const errorMiddleware = require("./middlewares/error");
 const helmet = require("helmet");
 const compression = require("compression");
-const path = require('path');
 
 const app = express();
 
