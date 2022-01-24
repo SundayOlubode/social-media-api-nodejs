@@ -225,3 +225,68 @@ exports.updatePost = catchAsyncError(async (req, res, next) => {
     });
 
 });
+
+
+// Add Comment
+exports.addComment = catchAsyncError(async (req, res, next) => {
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        return next(new ErrorHandler("Post not found.", 404));
+    }
+
+    post.comments.push({
+        user: req.user._id,
+        comment: req.body.comment
+    });
+
+    await post.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Comment added."
+    });
+
+});
+
+
+// Delete Comment
+exports.deleteComment = catchAsyncError(async (req, res, next) => {
+
+    const { commentId } = req.body;
+
+    if (!commentId) {
+        return next(new ErrorHandler("Comment Id is empty.", 400));
+    }
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        return next(new ErrorHandler("Post not found.", 404));
+    }
+
+    const comment = post.comments.find(item => item._id.toString() === commentId);
+
+    if (
+        post.owner.toString() === req.user._id.toString() ||
+        comment.user.toString() === req.user._id.toString()
+    ) {
+
+        const commentIndex = post.comments.indexOf(commentId.toString());
+
+        post.comments.splice(commentIndex, 1);
+
+        await post.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Comment deleted."
+        });
+
+    }
+    else {
+        return next(new ErrorHandler("Unauthorized.", 401));
+    }
+
+});

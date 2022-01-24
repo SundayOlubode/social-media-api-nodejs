@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 
 const userSchema = new mongoose.Schema({
@@ -116,7 +117,7 @@ userSchema.methods.generatePasswordResetToken = function () {
         .update(resetToken)
         .digest("hex");
 
-    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // Valid for 15 minutes
 
     return resetToken;
 }

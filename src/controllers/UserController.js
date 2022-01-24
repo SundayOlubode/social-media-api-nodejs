@@ -201,7 +201,7 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
     }
 
     if (newPassword !== confirmPassword) {
-        return next(new ErrorHandler("Both new passwords do not matched.", 400));
+        return next(new ErrorHandler("New passwords do not matched.", 400));
     }
 
     user.password = newPassword;
@@ -233,12 +233,13 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
     const resetToken = user.generatePasswordResetToken();
 
-    await user.save({ validateBeforeSave: false });
+    await user.save();
 
-    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset${resetToken}`;
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/reset/password/${resetToken}`;
 
-    const message = `Hello ${user.name},
-    \nYour password reset token is :- \n\n ${resetPasswordUrl}.
+    const message = `Hello ${user.fname},
+    \nYour password reset link is :- \n ${resetPasswordUrl}
+    \nThis link is valid for only 15 minutes.
     \nIf you have not requested this email then, please ignore it.
     \n\nThank You,\nNixLab Technologies Team`;
 
@@ -252,7 +253,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: `Email sent to ${user.email} successfully.`
+            message: `Email sent to ${user.email}.`
         });
 
     } catch (err) {
@@ -260,7 +261,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
 
-        await user.save({ validateBeforeSave: false });
+        await user.save();
 
         return next(new ErrorHandler(err.message, 500));
 
@@ -289,7 +290,7 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
     });
 
     if (!user) {
-        return next(new ErrorHandler("Token is invalid or expired.", 400));
+        return next(new ErrorHandler("Token is invalid or expired.", 401));
     }
 
     if (newPassword !== confirmPassword) {

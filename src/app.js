@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const errorMiddleware = require("./middlewares/error");
 const helmet = require("helmet");
 const compression = require("compression");
+const fileUpload = require("express-fileupload");
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(fileUpload());
 
 
 // Routes
