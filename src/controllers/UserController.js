@@ -12,6 +12,10 @@ exports.register = catchAsyncError(async (req, res, next) => {
 
     const { fname, lname, email, password, confirmPassword } = req.body;
 
+    if (!confirmPassword) {
+        return next(new ErrorHandler("Please enter confirm password.", 400));
+    }
+
     if (password !== confirmPassword) {
         return next(new ErrorHandler("Both passwords do not matched.", 400));
     }
@@ -328,7 +332,7 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     const cloudUpload = await cloudinary.v2.uploader
         .upload(avatar, {
-            folder: "avatars"
+            folder: "nixlab/avatars"
         });
 
     user.avatar = {

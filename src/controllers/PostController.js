@@ -23,7 +23,7 @@ exports.createPost = catchAsyncError(async (req, res, next) => {
 
         const result = await cloudinary.v2.uploader.upload(
             images[i],
-            { folder: "posts" }
+            { folder: "nixlab/posts" }
         );
 
         imageLinks.push({
@@ -200,7 +200,7 @@ exports.updatePost = catchAsyncError(async (req, res, next) => {
         for (let i = 0; i < postImages.length; i++) {
             const result = await cloudinary.v2.uploader.upload(
                 postImages[i],
-                { folder: "posts" }
+                { folder: "nixlab/posts" }
             );
 
             imageLinks.push({
