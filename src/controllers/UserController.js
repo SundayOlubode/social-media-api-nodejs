@@ -12,8 +12,11 @@ exports.register = catchAsyncError(async (req, res, next) => {
 
     const { fname, lname, email, password, confirmPassword } = req.body;
 
-    if (!confirmPassword) {
-        return next(new ErrorHandler("Please enter confirm password.", 400));
+    if (
+        !fname || !lname || !email ||
+        !password || !confirmPassword
+    ) {
+        return next(new ErrorHandler("Please enter required details.", 400));
     }
 
     if (password !== confirmPassword) {
