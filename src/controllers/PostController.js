@@ -41,9 +41,9 @@ exports.createPost = catchAsyncError(async (req, res, next) => {
         }
 
         req.body.images = imageLinks;
-    }
 
-    newPost.images = req.body.images;
+        newPost.images = req.body.images;
+    }
 
     const post = await Post.create(newPost);
 
