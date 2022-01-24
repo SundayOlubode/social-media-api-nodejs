@@ -8,38 +8,42 @@ const cloudinary = require("cloudinary");
 // Create Post
 exports.createPost = catchAsyncError(async (req, res, next) => {
 
-    let images = [];
-
-    if (typeof req.body.images === "string") {
-        images.push(req.body.images);
-    }
-    else {
-        images = req.body.images;
-    }
-
-    const imageLinks = [];
-
-    for (let i = 0; i < images.length; i++) {
-
-        const result = await cloudinary.v2.uploader.upload(
-            images[i],
-            { folder: "nixlab/posts" }
-        );
-
-        imageLinks.push({
-            public_id: result.public_id,
-            url: result.secure_url
-        });
-
-    }
-
-    req.body.images = imageLinks;
-
     const newPost = {
         caption: req.body.caption,
-        images: req.body.images,
         owner: req.user._id
     };
+
+    if (req.body.images) {
+
+        let images = [];
+
+        if (typeof req.body.images === "string") {
+            images.push(req.body.images);
+        }
+        else {
+            images = req.body.images;
+        }
+
+        const imageLinks = [];
+
+        for (let i = 0; i < images.length; i++) {
+
+            const result = await cloudinary.v2.uploader.upload(
+                images[i],
+                { folder: "nixlab/posts" }
+            );
+
+            imageLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url
+            });
+
+        }
+
+        req.body.images = imageLinks;
+    }
+
+    newPost.images = req.body.images;
 
     const post = await Post.create(newPost);
 
