@@ -5,9 +5,15 @@ const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
 
-    name: {
+    fname: {
         type: String,
-        required: [true, "Please enter a name."]
+        minlength: [3, "password must be at least 3 characters."],
+        required: [true, "Please enter a first name."]
+    },
+
+    lname: {
+        type: String,
+        required: [true, "Please enter a last name."]
     },
 
     email: {
@@ -19,6 +25,18 @@ const userSchema = new mongoose.Schema({
     avatar: {
         public_id: String,
         url: String
+    },
+
+    phone: {
+        type: Number,
+    },
+
+    gender: {
+        type: String
+    },
+
+    dob: {
+        type: Date
     },
 
     password: {
@@ -49,6 +67,20 @@ const userSchema = new mongoose.Schema({
         }
     ],
 
+    role: {
+        type: String,
+        default: "user"
+    },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+
+    resetPasswordToken: String,
+
+    resetPasswordExpire: Date
+
 });
 
 
@@ -74,7 +106,7 @@ userSchema.methods.matchPassword = async function (userPassword) {
 }
 
 // Generate Password Reset Token
-userSchema.methods.getResetPasswordToken = function () {
+userSchema.methods.generatePasswordResetToken = function () {
 
     // Generating Token
     const resetToken = crypto.randomBytes(32).toString("hex");

@@ -4,7 +4,8 @@ const {
     likeAndUnlikePost,
     deletePost,
     getFollowingPost,
-    updatePost
+    updatePost,
+    getPostDetails
 } = require("../controllers/PostController");
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
@@ -15,9 +16,12 @@ const router = express.Router();
 router.route("/post/create").post(isAuthenticatedUser, createPost);
 
 router.route("/post/:id")
-    .get(isAuthenticatedUser, likeAndUnlikePost)
+    .get(isAuthenticatedUser, getPostDetails)
     .put(isAuthenticatedUser, updatePost)
     .delete(isAuthenticatedUser, deletePost);
+
+router.route("/post/like/:id")
+    .get(isAuthenticatedUser, likeAndUnlikePost)
 
 router.route("/posts").get(isAuthenticatedUser, getFollowingPost);
 

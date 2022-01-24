@@ -2,12 +2,19 @@ const catchAsyncError = require("../middlewares/catchAsyncError");
 const User = require("../models/UserModel");
 const Post = require("../models/PostModel");
 const ErrorHandler = require("../utils/errorHandler");
+const sendEmail = require("../utils/sendEmail");
+const crypto = require("crypto");
+const cloudinary = require("cloudinary");
 
 
 // Register User
 exports.register = catchAsyncError(async (req, res, next) => {
 
-    const { name, email, password } = req.body;
+    const { fname, lname, email, password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+        return next(new ErrorHandler("Both passwords do not matched.", 400));
+    }
 
     let user = await User.findOne({ email });
 
@@ -16,29 +23,45 @@ exports.register = catchAsyncError(async (req, res, next) => {
     }
 
     user = await User.create({
-        name,
+        fname,
+        lname,
         email,
-        password,
-        avatar: {
-            public_id: 'smaple_pub_id',
-            url: 'sample_url'
+        password
+    });
+
+    const message = `Hello ${user.fname},
+    \nWe're glad you're here! Welcome to NixLab Technologies.
+    \n\nThank you for joining with us.
+    \n\nThank You,\nNixLab Technologies Team`;
+
+    try {
+
+        await sendEmail({
+            email: user.email,
+            subject: `Welcome to NixLab Technologies`,
+            message: message
+        });
+
+        const token = user.generateToken();
+
+        // Options for cookie
+        const options = {
+            expires: new Date(Date.now + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+            httpOnly: true
         }
-    });
 
-    const token = user.generateToken();
+        res.status(201).cookie('token', token, options).json({
+            success: true,
+            message: "User registered.",
+            token: token,
+            user: user
+        });
 
-    // Options for cookie
-    const options = {
-        expires: new Date(Date.now + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-        httpOnly: true
+    } catch (err) {
+
+        return next(new ErrorHandler(err.message, 500));
+
     }
-
-    res.status(201).cookie('token', token, options).json({
-        success: true,
-        message: "User registered.",
-        token: token,
-        user: user
-    });
 
 });
 
@@ -190,6 +213,140 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Forgot Password
+exports.forgotPassword = catchAsyncError(async (req, res, next) => {
+
+    const { email } = req.body;
+
+    if (!email) {
+        return next(new ErrorHandler("Please enter your email associated with account.", 400));
+    }
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    const resetToken = user.generatePasswordResetToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset${resetToken}`;
+
+    const message = `Hello ${user.name},
+    \nYour password reset token is :- \n\n ${resetPasswordUrl}.
+    \nIf you have not requested this email then, please ignore it.
+    \n\nThank You,\nNixLab Technologies Team`;
+
+    try {
+
+        await sendEmail({
+            email: user.email,
+            subject: `Account Password Recovery`,
+            message: message
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `Email sent to ${user.email} successfully.`
+        });
+
+    } catch (err) {
+
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        return next(new ErrorHandler(err.message, 500));
+
+    }
+
+});
+
+
+// Reset Password
+exports.resetPassword = catchAsyncError(async (req, res, next) => {
+
+    const { newPassword, confirmPassword } = req.body;
+
+    if (!newPassword || !confirmPassword) {
+        return next(new ErrorHandler("Please enter new password and confirm password.", 400));
+    }
+
+    const token = req.params.token;
+
+    const resetPasswordToken = crypto.createHash("sha256")
+        .update(token).digest("hex");
+
+    const user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        return next(new ErrorHandler("Token is invalid or expired.", 400));
+    }
+
+    if (newPassword !== confirmPassword) {
+        return next(new ErrorHandler("Passwords do not matched.", 400));
+    }
+
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Password changed."
+    });
+
+});
+
+
+// Upload User Avatar
+exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
+
+    const { avatar } = req.body;
+
+    if (!avatar) {
+        return next(new ErrorHandler("Please provide avatar image.", 400));
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (user.avatar) {
+
+        const imageId = user.avatar.public_id;
+
+        await cloudinary.v2.uploader.destroy(imageId);
+
+    }
+
+    const cloudUpload = await cloudinary.v2.uploader
+        .upload(avatar, {
+            folder: "avatars"
+        });
+
+    user.avatar = {
+        public_id: cloudUpload.public_id,
+        url: cloudUpload.secure_url
+    }
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "User avatar updated."
+    });
+
+
+});
+
+
 // Update User Profile
 exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
@@ -206,27 +363,6 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
     }
 
     await user.save();
-
-    // if (req.body.avatar !== "") {
-    //     const user = await User.findById(req.user.id);
-
-    //     const imageId = user.avatar.public_id;
-
-    //     await cloudinary.v2.uploader.destroy(imageId);
-
-    //     const cloudUpload = await cloudinary.v2.uploader
-    //         .upload(req.body.avatar, {
-    //             folder: 'avatars',
-    //             width: 150,
-    //             crop: 'scale'
-    //         });
-
-    //     newUserDetails.avatar = {
-    //         public_id: cloudUpload.public_id,
-    //         url: cloudUpload.secure_url
-    //     }
-
-    // }
 
 
     res.status(200).json({
@@ -305,7 +441,7 @@ exports.getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 });
 
 
-// Get All Users
+// Get All Users -- Admin
 exports.getAllUsers = catchAsyncError(async (req, res, next) => {
 
     const users = await User.find();
@@ -317,3 +453,53 @@ exports.getAllUsers = catchAsyncError(async (req, res, next) => {
     });
 
 });
+
+
+// Update User Role -- Admin
+exports.updateUserRole = catchAsyncError(async (req, res, next) => {
+
+    const { role } = req.body;
+
+    if (!role) {
+        return next(new ErrorHandler("Please enter a role.", 400));
+    }
+
+    const user = User.findById(req.params.id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    user.role = String(role).toLowerCase();
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "User role updated."
+    });
+
+});
+
+
+// Delete User -- Admin
+exports.deleteUser = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    const imageId = user.avatar.public_id;
+
+    await cloudinary.v2.uploader.destroy(imageId);
+
+    await user.remove();
+
+    res.status(200).json({
+        success: true,
+        message: "User deleted."
+    });
+
+})

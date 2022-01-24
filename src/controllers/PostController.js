@@ -2,17 +2,42 @@ const catchAsyncError = require("../middlewares/catchAsyncError");
 const Post = require("../models/PostModel");
 const User = require("../models/UserModel");
 const ErrorHandler = require("../utils/errorHandler");
+const cloudinary = require("cloudinary");
 
 
 // Create Post
 exports.createPost = catchAsyncError(async (req, res, next) => {
 
+    let images = [];
+
+    if (typeof req.body.images === "string") {
+        images.push(req.body.images);
+    }
+    else {
+        images = req.body.images;
+    }
+
+    const imageLinks = [];
+
+    for (let i = 0; i < images.length; i++) {
+
+        const result = await cloudinary.v2.uploader.upload(
+            images[i],
+            { folder: "posts" }
+        );
+
+        imageLinks.push({
+            public_id: result.public_id,
+            url: result.secure_url
+        });
+
+    }
+
+    req.body.images = imageLinks;
+
     const newPost = {
         caption: req.body.caption,
-        image: {
-            public_id: 'smaple_pub_id',
-            url: 'sample_url'
-        },
+        images: req.body.images,
         owner: req.user._id
     };
 
@@ -81,9 +106,15 @@ exports.deletePost = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Unauthorized.", 401));
     }
 
-    const user = await User.findById(req.user._id);
+    for (let i = 0; i < post.images.length; i++) {
+        await cloudinary.v2.uploader.destroy(
+            post.images[i].public_id
+        );
+    }
 
     await post.remove();
+
+    const user = await User.findById(req.user._id);
 
     const index = user.posts.indexOf(req.params.id);
 
@@ -119,10 +150,38 @@ exports.getFollowingPost = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Get Post Details
+exports.getPostDetails = catchAsyncError(async (req, res, next) => {
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        return next(new ErrorHandler("Post not found.", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        result: post
+    })
+
+});
+
+
 // Update Post
 exports.updatePost = catchAsyncError(async (req, res, next) => {
 
-    const { caption } = req.body;
+    const { caption, images } = req.body;
+
+    let postImages = [];
+
+    if (images) {
+        if (typeof images === "string") {
+            postImages.push(images);
+        }
+        else {
+            postImages = images;
+        }
+    }
 
     const post = await Post.findById(req.params.id);
 
@@ -134,7 +193,29 @@ exports.updatePost = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Unauthorized.", 401));
     }
 
+    if (postImages !== undefined) {
+
+        const imageLinks = [];
+
+        for (let i = 0; i < postImages.length; i++) {
+            const result = await cloudinary.v2.uploader.upload(
+                postImages[i],
+                { folder: "posts" }
+            );
+
+            imageLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url
+            });
+        }
+
+        images = imageLinks;
+
+    }
+
     post.caption = caption;
+
+    post.images = images;
 
     await post.save();
 
