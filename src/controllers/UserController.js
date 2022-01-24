@@ -36,39 +36,35 @@ exports.register = catchAsyncError(async (req, res, next) => {
         password
     });
 
+    const token = user.generateToken();
+
     const message = `Hello ${user.fname},
     \nWe're glad you're here! Welcome to NixLab Technologies.
     \n\nThank you for joining with us.
     \n\nThank You,\nNixLab Technologies Team`;
 
     try {
-
         await sendEmail({
             email: user.email,
             subject: `Welcome to NixLab Technologies`,
             message: message
         });
-
-        const token = user.generateToken();
-
-        // Options for cookie
-        const options = {
-            expires: new Date(Date.now + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-            httpOnly: true
-        }
-
-        res.status(201).cookie('token', token, options).json({
-            success: true,
-            message: "User registered.",
-            token: token,
-            user: user
-        });
-
     } catch (err) {
-
-        return next(new ErrorHandler(err.message, 500));
-
+        console.log(err.message);
     }
+
+    // Options for cookie
+    const options = {
+        expires: new Date(Date.now + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    }
+
+    res.status(201).cookie('token', token, options).json({
+        success: true,
+        message: "User registered.",
+        token: token,
+        user: user
+    });
 
 });
 
