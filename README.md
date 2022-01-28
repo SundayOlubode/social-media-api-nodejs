@@ -2,14 +2,14 @@
 
 ## Features
 
--- Authentication
--- Add Post
--- Get Posts
--- Get Post Details
--- Delete Post
--- Add Post Comment
--- Delete Post Comment
--- Add Post Like
+- Authentication
+- Add Post
+- Get Posts
+- Get Post Details
+- Delete Post
+- Add Post Comment
+- Delete Post Comment
+- Add Post Like
 
 ## Connect With Me
 
