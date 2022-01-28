@@ -1,5 +1,16 @@
 # nixlab-api-nodejs
 
+## Features
+
+-- Authentication
+-- Add Post
+-- Get Posts
+-- Get Post Details
+-- Delete Post
+-- Add Post Comment
+-- Delete Post Comment
+-- Add Post Like
+
 ## Connect With Me
 
 [<img align="left" alt="nixrajput | Website" width="24px" src="https://raw.githubusercontent.com/nixrajput/nixlab-files/master/images/icons/globe-icon.svg" />][website]
@@ -18,6 +29,6 @@
 [github]: https://github.com/nixrajput
 [website]: https://nixlab.co.in
 [facebook]: https://facebook.com/nixrajput07
-[twitter]: https://twitter.com/nixrajput07
+[twitter]: https://twitter.com/nixrajput_
 [instagram]: https://instagram.com/nixrajput
 [linkedin]: https://linkedin.com/in/nixrajput
