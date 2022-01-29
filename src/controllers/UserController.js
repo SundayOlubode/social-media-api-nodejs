@@ -5,6 +5,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
+const jwt = require("jsonwebtoken");
 
 
 // Register User
@@ -37,6 +38,9 @@ exports.register = catchAsyncError(async (req, res, next) => {
     });
 
     const token = user.generateToken();
+    await user.save();
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    const expiresAt = decodedData.exp;
 
     const message = `Hello ${user.fname},
     \nWe're glad you're here! Welcome to NixLab Technologies.
@@ -63,7 +67,7 @@ exports.register = catchAsyncError(async (req, res, next) => {
         success: true,
         message: "User registered.",
         token: token,
-        user: user
+        expiresAt: expiresAt
     });
 
 });
@@ -82,7 +86,7 @@ exports.login = catchAsyncError(async (req, res, next) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-        return next(new ErrorHandler("User does not exist.", 404));
+        return next(new ErrorHandler("User not found.", 404));
     }
 
     const isPasswordMatched = await user.matchPassword(password);
@@ -91,7 +95,28 @@ exports.login = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Incorrect password.", 400));
     }
 
-    const token = user.generateToken();
+    let token = user.token;
+    let expiresAt;
+
+    if (token) {
+        let decodedData;
+
+        decodedData = jwt.verify(token, process.env.JWT_SECRET);
+        expiresAt = decodedData.exp;
+
+        if (decodedData.exp < new Date().getTime() / 1000) {
+            token = user.generateToken();
+            await user.save();
+            decodedData = jwt.verify(token, process.env.JWT_SECRET);
+            expiresAt = decodedData.exp;
+        }
+    }
+    else {
+        token = user.generateToken();
+        await user.save();
+        decodedData = jwt.verify(token, process.env.JWT_SECRET);
+        expiresAt = decodedData.exp;
+    }
 
     // Options for cookie
     const options = {
@@ -99,12 +124,14 @@ exports.login = catchAsyncError(async (req, res, next) => {
         httpOnly: true
     }
 
-    res.status(200).cookie('token', token, options).json({
-        success: true,
-        message: "User logged in.",
-        token: token,
-        user: user
-    });
+    res.status(200)
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            message: "User logged in.",
+            token: token,
+            expiresAt: expiresAt
+        });
 
 });
 

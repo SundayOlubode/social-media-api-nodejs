@@ -78,6 +78,8 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     },
 
+    token: String,
+
     resetPasswordToken: String,
 
     resetPasswordExpire: Date
@@ -96,9 +98,14 @@ userSchema.pre("save", async function (next) {
 
 // JWT Token
 userSchema.methods.generateToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+
+    const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
-    })
+    });
+
+    this.token = token;
+
+    return token;
 }
 
 // Match Password
