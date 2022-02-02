@@ -381,16 +381,16 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 // Update User Profile
 exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
-    const { name, email } = req.body;
+    const { fname, lname } = req.body;
 
     const user = await User.findById(req.user._id);
 
-    if (name) {
-        user.name = name;
+    if (fname) {
+        user.fname = fname;
     }
 
-    if (email) {
-        user.email = email;
+    if (lname) {
+        user.lname = lname;
     }
 
     await user.save();
