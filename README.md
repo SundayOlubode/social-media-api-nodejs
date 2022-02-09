@@ -1,5 +1,7 @@
 # nixlab-api-nodejs
 
+An open-source API for User Authentication and User Profile Management developed using NodeJS, ExpressJS and MongoDB.
+
 ## Features
 
 - Login
@@ -10,7 +12,7 @@
 
 ## Documentation
 
-[Docs][https://documenter.getpostman.com/view/16658281/UVeCQTxt]
+[Docs](https://documenter.getpostman.com/view/16658281/UVeCQTxt)
 
 ## Connect With Me
 
