@@ -57,12 +57,20 @@ exports.register = catchAsyncError(async (req, res, next) => {
         console.log(err.message);
     }
 
-    res.status(201).json({
-        success: true,
-        message: "User registered.",
-        token: token,
-        expiresAt: expiresAt
-    });
+    // Options for cookie
+    const options = {
+        expires: new Date(Date.now + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    }
+
+    res.status(201)
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            message: "User registered.",
+            token: token,
+            expiresAt: expiresAt
+        });
 
 });
 
@@ -112,7 +120,14 @@ exports.login = catchAsyncError(async (req, res, next) => {
         expiresAt = decodedData.exp;
     }
 
+    // Options for cookie
+    const options = {
+        expires: new Date(Date.now + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    }
+
     res.status(200)
+        .cookie('token', token, options)
         .json({
             success: true,
             message: "User logged in.",
