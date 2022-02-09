@@ -10,7 +10,7 @@
 
 ## Documentation
 
-[https://documenter.getpostman.com/view/16658281/UVeCQTxt][Docs]
+[Docs][https://documenter.getpostman.com/view/16658281/UVeCQTxt]
 
 ## Connect With Me
 
