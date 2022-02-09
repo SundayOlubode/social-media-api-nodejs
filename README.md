@@ -2,14 +2,15 @@
 
 ## Features
 
-- Authentication
-- Add Post
-- Get Posts
-- Get Post Details
-- Delete Post
-- Add Post Comment
-- Delete Post Comment
-- Add Post Like
+- Login
+- Registration
+- Get Profile Details
+- Update Profile Details
+- Delete Profile
+
+## Documentation
+
+[https://documenter.getpostman.com/view/16658281/UVeCQTxt][Docs]
 
 ## Connect With Me
 
