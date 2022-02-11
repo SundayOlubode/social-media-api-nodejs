@@ -6,18 +6,65 @@ const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 const jwt = require("jsonwebtoken");
+const { validateEmail, validateUsername } = require("../utils/validations");
 
 
 // Register User
 exports.register = catchAsyncError(async (req, res, next) => {
 
-    const { fname, lname, email, password, confirmPassword } = req.body;
+    const { fname, lname, email, uname, password, confirmPassword } = req.body;
 
-    if (
-        !fname || !lname || !email ||
-        !password || !confirmPassword
-    ) {
-        return next(new ErrorHandler("Please enter required details.", 400));
+    // Input Validation
+    if (!fname) {
+        return next(new ErrorHandler("Please enter your first name.", 400));
+    }
+
+    if (String(fname).length < 3) {
+        return next(new ErrorHandler("First name must be at least 3 characters.", 400));
+    }
+
+    if (!lname) {
+        return next(new ErrorHandler("Please enter your last name.", 400));
+    }
+
+    if (!email) {
+        return next(new ErrorHandler("Please enter your email.", 400));
+    }
+
+    if (email && !validateEmail(email)) {
+        return next(new ErrorHandler("Please enter a valid email address.", 400));
+    }
+
+    if (!uname) {
+        return next(new ErrorHandler("Please enter an username.", 400));
+    }
+
+    if (String(uname).length < 3) {
+        return next(new ErrorHandler("Username must be at least 3 characters.", 400));
+    }
+
+    if (String(uname).length > 20) {
+        return next(new ErrorHandler("Username must not exceeds 20 characters", 400));
+    }
+
+    if (uname && !validateUsername(uname)) {
+        return next(new ErrorHandler("Please enter a valid username.", 400));
+    }
+
+    if (uname) {
+        const isUsernameAvailable = await checkUsernameAvailable(uname);
+
+        if (!isUsernameAvailable) {
+            return next(new ErrorHandler("Username not available.", 400));
+        }
+    }
+
+    if (!password) {
+        return next(new ErrorHandler("Please enter a password.", 400));
+    }
+
+    if (!confirmPassword) {
+        return next(new ErrorHandler("Please enter the password again.", 400));
     }
 
     if (password !== confirmPassword) {
@@ -34,6 +81,7 @@ exports.register = catchAsyncError(async (req, res, next) => {
         fname,
         lname,
         email,
+        uname,
         password
     });
 
@@ -43,7 +91,7 @@ exports.register = catchAsyncError(async (req, res, next) => {
     const expiresAt = decodedData.exp;
 
     const message = `Hello ${user.fname},
-    \nWe're glad you're here! Welcome to NixLab Technologies.
+    \nWelcome to NixLab Technologies. We're glad you're here!
     \n\nThank you for joining with us.
     \n\nThank You,\nNixLab Technologies Team`;
 
@@ -67,14 +115,33 @@ exports.register = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Check Username Availability
+const checkUsernameAvailable = async (uname) => {
+    let user = await User.findOne({ uname });
+
+    if (user) {
+        return false;
+    }
+
+    return true;
+}
+
+
 // Login User
 exports.login = catchAsyncError(async (req, res, next) => {
 
     const { email, password } = req.body;
 
-    // Email and Password validation
-    if (!email || !password) {
-        return next(new ErrorHandler("Please enter email and password to login.", 401));
+    if (!email) {
+        return next(new ErrorHandler("Please enter your email.", 400));
+    }
+
+    if (email && !validateEmail(email)) {
+        return next(new ErrorHandler("Please enter a valid email address.", 400));
+    }
+
+    if (!password) {
+        return next(new ErrorHandler("Please enter your password.", 400));
     }
 
     const user = await User.findOne({ email }).select("+password");
@@ -323,15 +390,15 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
 // Upload User Avatar
 exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
-    const { avatar } = req.body;
+    const avatar = req.body.avatar;
 
     if (!avatar) {
-        return next(new ErrorHandler("Please provide avatar image.", 400));
+        return next(new ErrorHandler("Please provide an avatar image.", 400));
     }
 
     const user = await User.findById(req.user._id);
 
-    if (user.avatar) {
+    if (Object.keys(user.avatar).length > 0) {
 
         const imageId = user.avatar.public_id;
 
@@ -339,24 +406,31 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     }
 
-    const cloudUpload = await cloudinary.v2.uploader
+    await cloudinary.v2.uploader
         .upload(avatar, {
             folder: "nixlab/avatars"
+        }).then(async (result) => {
+
+            user.avatar = {
+                public_id: result.public_id,
+                url: result.secure_url
+            }
+
+            await user.save();
+
+            res.status(200).json({
+                success: true,
+                message: "User avatar updated."
+            });
+
+        }).catch((err) => {
+
+            res.status(200).json({
+                success: true,
+                message: err.message,
+            });
+
         });
-
-    user.avatar = {
-        public_id: cloudUpload.public_id,
-        url: cloudUpload.secure_url
-    }
-
-    await user.save();
-
-    res.status(200).json({
-        success: true,
-        message: "User avatar updated."
-    });
-
-
 });
 
 
@@ -387,6 +461,29 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Check Username Availabilty
+exports.checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
+
+    const { uname } = req.body;
+
+    const isUsernameAvailable = await checkUsernameAvailable(uname);
+
+    if (isUsernameAvailable) {
+        res.status(200).json({
+            success: true,
+            message: "Username available."
+        });
+    }
+    else {
+        res.status(200).json({
+            success: false,
+            message: "Username not available."
+        });
+    }
+
+});
+
+
 // Delete User Profile
 exports.deleteProfile = catchAsyncError(async (req, res, next) => {
 
@@ -398,11 +495,6 @@ exports.deleteProfile = catchAsyncError(async (req, res, next) => {
     const userId = user._id;
 
     await user.remove();
-
-    res.cookie('token', null, {
-        expires: new Date(Date.now()),
-        httpOnly: true
-    });
 
     for (let i = 0; i < posts.length; i++) {
         const post = await Post.findById(posts[i]);

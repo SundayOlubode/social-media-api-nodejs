@@ -14,7 +14,8 @@ const {
     resetPassword,
     uploadAvatar,
     updateUserRole,
-    deleteUser
+    deleteUser,
+    checkUsernameAvailability
 } = require("../controllers/UserController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
@@ -27,6 +28,8 @@ router.route("/register").post(register);
 router.route("/login").post(login);
 
 router.route("/logout").get(logout);
+
+router.route("/check/username").post(checkUsernameAvailability);
 
 router.route("/me").get(isAuthenticatedUser, getProfileDetails);
 

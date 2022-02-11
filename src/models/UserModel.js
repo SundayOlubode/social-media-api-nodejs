@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
 
     fname: {
         type: String,
-        minlength: [3, "password must be at least 3 characters."],
+        minlength: [3, "First name must be at least 3 characters."],
         required: [true, "Please enter a first name."]
     },
 
@@ -20,16 +20,31 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, "Please enter an email."],
-        unique: [true, "Email already exists."]
+        unique: [true, "Email already exists."],
+    },
+
+    uname: {
+        type: String,
+        required: [true, "Please enter an username."],
+        unique: [true, "Username not available."],
+        minlength: [3, "Username must be at least 3 characters."],
+        maxlength: [20, "Username must not exceeds 20 characters."],
+    },
+
+    phone: {
+        type: Number,
+    },
+
+    password: {
+        type: String,
+        required: [true, "Please enter a password."],
+        minlength: [6, "password must be at least 6 characters."],
+        select: false
     },
 
     avatar: {
         public_id: String,
         url: String
-    },
-
-    phone: {
-        type: Number,
     },
 
     gender: {
@@ -38,13 +53,6 @@ const userSchema = new mongoose.Schema({
 
     dob: {
         type: Date
-    },
-
-    password: {
-        type: String,
-        required: [true, "Please enter a password."],
-        minlength: [6, "password must be at least 6 characters."],
-        select: false
     },
 
     posts: [
