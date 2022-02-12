@@ -408,7 +408,7 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     await cloudinary.v2.uploader
         .upload(avatar, {
-            folder: "nixlab/avatars"
+            folder: "avatars"
         }).then(async (result) => {
 
             user.avatar = {
