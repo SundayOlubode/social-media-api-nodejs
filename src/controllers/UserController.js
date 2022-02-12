@@ -418,8 +418,6 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
             await user.save();
 
-            console.log("Image uploaded.");
-
             res.status(200).json({
                 success: true,
                 message: "User avatar updated."
