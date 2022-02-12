@@ -437,16 +437,43 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 // Update User Profile
 exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
-    const { fname, lname } = req.body;
+    const { fname, lname, phone, gender, dob } = req.body;
 
     const user = await User.findById(req.user._id);
 
     if (fname) {
-        user.fname = fname;
+        if (String(fname).length < 3) {
+            return next(new ErrorHandler("First name must be at least 3 characters.", 400));
+        }
+        else {
+            user.fname = fname;
+        }
     }
 
     if (lname) {
-        user.lname = lname;
+        if (String(lname).length < 1) {
+            return next(new ErrorHandler("Last name can't be empty.", 400));
+        }
+        else {
+            user.lname = lname;
+        }
+    }
+
+    if (phone) {
+        const phoneRegExp = /^\d{10}$/;
+        if (!String(phone).match(phoneRegExp)) {
+            return next(new ErrorHandler("Enter a valid phone number.", 400));
+        }
+
+        user.phone.phoneNo = phone;
+    }
+
+    if (gender) {
+        user.gender = gender;
+    }
+
+    if (dob) {
+        user.dob = dob;
     }
 
     await user.save();
@@ -454,8 +481,7 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: "User profile updated.",
-        user
+        message: "User profile updated."
     });
 
 });

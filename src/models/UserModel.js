@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
     },
 
     phone: {
-        type: Number,
+        countryCode: String,
+        phoneNo: Number
     },
 
     password: {
@@ -47,13 +48,9 @@ const userSchema = new mongoose.Schema({
         url: String
     },
 
-    gender: {
-        type: String
-    },
+    gender: String,
 
-    dob: {
-        type: Date
-    },
+    dob: String,
 
     posts: [
         {
