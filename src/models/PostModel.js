@@ -37,6 +37,11 @@ const postSchema = new mongoose.Schema({
         }
     ],
 
+    postStatus: {
+        type: String,
+        default: "active"
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

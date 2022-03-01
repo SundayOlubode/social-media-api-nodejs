@@ -304,7 +304,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Please enter your email associated with account.", 400));
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email });
 
     if (!user) {
         return next(new ErrorHandler("User not found.", 404));
@@ -686,6 +686,33 @@ exports.updateUserRole = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: "User role updated."
+    });
+
+});
+
+
+// Update Account Status -- Admin
+exports.updateAccountStatus = catchAsyncError(async (req, res, next) => {
+
+    const { status } = req.body;
+
+    if (!status) {
+        return next(new ErrorHandler("Please enter a status.", 400));
+    }
+
+    const user = User.findById(req.params.id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    user.accountStatus = String(status).toLowerCase();
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Account status updated."
     });
 
 });

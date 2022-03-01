@@ -97,6 +97,80 @@ exports.likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Update Post
+exports.updatePost = catchAsyncError(async (req, res, next) => {
+
+    const { caption } = req.body;
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+        return next(new ErrorHandler("Post not found.", 404));
+    }
+
+    if (post.owner.toString() !== req.user._id.toString()) {
+        return next(new ErrorHandler("Unauthorized.", 401));
+    }
+
+    if (caption) {
+        post.caption = caption;
+    }
+
+    if (req.body.images) {
+
+        if (post.images.length > 0) {
+
+            for (let i = 0; i < post.images.length; i++) {
+                await cloudinary.v2.uploader.destroy(
+                    post.images[i].public_id
+                );
+            }
+
+        }
+
+        let postImages = [];
+
+        if (typeof req.body.images === "string") {
+            postImages.push(req.body.images);
+        }
+        else {
+            postImages = req.body.images;
+        }
+
+        if (postImages !== undefined) {
+
+            let imageLinks = [];
+
+            for (let i = 0; i < postImages.length; i++) {
+                const result = await cloudinary.v2.uploader.upload(
+                    postImages[i],
+                    { folder: "nixlab/posts" }
+                );
+
+                imageLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url
+                });
+            }
+
+            req.body.images = imageLinks;
+
+            post.images = req.body.images;
+
+        }
+
+    }
+
+    await post.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Post updated."
+    });
+
+});
+
+
 // Delete Post
 exports.deletePost = catchAsyncError(async (req, res, next) => {
 
@@ -135,7 +209,7 @@ exports.deletePost = catchAsyncError(async (req, res, next) => {
 
 
 // Get Following's Post
-exports.getFollowingPost = catchAsyncError(async (req, res, next) => {
+exports.getFollowingPosts = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
@@ -148,7 +222,21 @@ exports.getFollowingPost = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
         success: true,
         count: posts.length,
-        posts: posts
+        posts
+    })
+
+});
+
+
+// Get All Posts
+exports.getAllPosts = catchAsyncError(async (req, res, next) => {
+
+    const posts = await Post.find();
+
+    res.status(200).json({
+        success: true,
+        count: posts.length,
+        posts
     })
 
 });
@@ -165,68 +253,8 @@ exports.getPostDetails = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        result: post
+        post
     })
-
-});
-
-
-// Update Post
-exports.updatePost = catchAsyncError(async (req, res, next) => {
-
-    const { caption, images } = req.body;
-
-    let postImages = [];
-
-    if (images) {
-        if (typeof images === "string") {
-            postImages.push(images);
-        }
-        else {
-            postImages = images;
-        }
-    }
-
-    const post = await Post.findById(req.params.id);
-
-    if (!post) {
-        return next(new ErrorHandler("Post not found.", 404));
-    }
-
-    if (post.owner.toString() !== req.user._id.toString()) {
-        return next(new ErrorHandler("Unauthorized.", 401));
-    }
-
-    if (postImages !== undefined) {
-
-        const imageLinks = [];
-
-        for (let i = 0; i < postImages.length; i++) {
-            const result = await cloudinary.v2.uploader.upload(
-                postImages[i],
-                { folder: "nixlab/posts" }
-            );
-
-            imageLinks.push({
-                public_id: result.public_id,
-                url: result.secure_url
-            });
-        }
-
-        images = imageLinks;
-
-    }
-
-    post.caption = caption;
-
-    post.images = images;
-
-    await post.save();
-
-    res.status(200).json({
-        success: true,
-        message: "Post updated."
-    });
 
 });
 

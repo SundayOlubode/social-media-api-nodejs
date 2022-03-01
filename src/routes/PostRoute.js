@@ -3,11 +3,12 @@ const {
     createPost,
     likeAndUnlikePost,
     deletePost,
-    getFollowingPost,
+    getFollowingPosts,
     updatePost,
     getPostDetails,
     addComment,
-    deleteComment
+    deleteComment,
+    getAllPosts
 } = require("../controllers/PostController");
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
@@ -15,6 +16,7 @@ const router = express.Router();
 
 
 // Routes
+
 router.route("/post/create").post(isAuthenticatedUser, createPost);
 
 router.route("/post/:id")
@@ -25,11 +27,16 @@ router.route("/post/:id")
 router.route("/post/like/:id")
     .get(isAuthenticatedUser, likeAndUnlikePost)
 
-router.route("/posts").get(isAuthenticatedUser, getFollowingPost);
+router.route("/posts").get(isAuthenticatedUser, getFollowingPosts);
 
 router.route("/post/comment/:id")
     .post(isAuthenticatedUser, addComment)
     .delete(isAuthenticatedUser, deleteComment);
+
+
+// Admin Routes
+
+router.route("/admin/posts").get(isAuthenticatedUser, getAllPosts);
 
 
 module.exports = router;
