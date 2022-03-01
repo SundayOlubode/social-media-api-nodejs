@@ -495,12 +495,60 @@ exports.checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
 
     const { uname } = req.body;
 
+    if (!uname) {
+        return next(new ErrorHandler("Please enter an username.", 400));
+    }
+
+    if (uname && !validateUsername(uname)) {
+        return next(new ErrorHandler("Please enter a valid username.", 400));
+    }
+
     const isUsernameAvailable = await checkUsernameAvailable(uname);
 
     if (isUsernameAvailable) {
         res.status(200).json({
             success: true,
             message: "Username available."
+        });
+    }
+    else {
+        res.status(200).json({
+            success: false,
+            message: "Username not available."
+        });
+    }
+
+});
+
+
+// Update Username
+exports.updateUsername = catchAsyncError(async (req, res, next) => {
+
+    const { uname } = req.body;
+
+    if (!uname) {
+        return next(new ErrorHandler("Please enter an username.", 400));
+    }
+
+    if (uname && !validateUsername(uname)) {
+        return next(new ErrorHandler("Please enter a valid username.", 400));
+    }
+
+    const isUsernameAvailable = await checkUsernameAvailable(uname);
+
+    if (isUsernameAvailable) {
+
+        const user = await User.findById(req.user._id);
+
+        if (uname) {
+            user.uname = uname;
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Username updated."
         });
     }
     else {

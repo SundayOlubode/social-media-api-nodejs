@@ -15,7 +15,8 @@ const {
     uploadAvatar,
     updateUserRole,
     deleteUser,
-    checkUsernameAvailability
+    checkUsernameAvailability,
+    updateUsername
 } = require("../controllers/UserController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
@@ -43,13 +44,19 @@ router.route("/reset/password/:token").put(resetPassword);
 
 router.route("/update/me").put(isAuthenticatedUser, updateUserProfile);
 
+router.route("/update/username").put(isAuthenticatedUser, updateUsername);
+
 router.route("/avatar/me").put(isAuthenticatedUser, uploadAvatar);
 
 router.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
 
 router.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
-router.route("/admin/users").get(isAuthenticatedUser, getAllUsers);
+
+// Admin Routes
+
+router.route("/admin/users")
+.get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
 
 router.route("/admin/user/:id")
     .get(isAuthenticatedUser, authorizeRoles("admin"), getUserProfileDetails)
