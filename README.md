@@ -12,7 +12,7 @@ An open-source API for User Authentication and User Profile Management developed
 
 ## Documentation
 
-[Docs](https://documenter.getpostman.com/view/16658281/UVeCQTxt)
+[Docs](https://rapidapi.com/nixlab-technologies-nixlab-technologies-default/api/social-media5)
 
 ## Connect With Me
 
