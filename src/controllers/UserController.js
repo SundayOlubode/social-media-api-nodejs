@@ -464,11 +464,11 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     if (phone) {
         const phoneRegExp = /^\d{10}$/;
-        if (!String(phone).match(phoneRegExp)) {
+        if (!String(phone.phoneNo).match(phoneRegExp)) {
             return next(new ErrorHandler("Enter a valid phone number.", 400));
         }
 
-        user.phone.phoneNo = phone;
+        user.phone = phone;
     }
 
     if (gender) {
