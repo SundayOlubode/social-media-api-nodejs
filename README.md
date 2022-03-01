@@ -32,6 +32,6 @@ An open-source API for User Authentication and User Profile Management developed
 [github]: https://github.com/nixrajput
 [website]: https://nixlab.co.in
 [facebook]: https://facebook.com/nixrajput07
-[twitter]: https://twitter.com/nixrajput_
+[twitter]: https://twitter.com/nixrajput07
 [instagram]: https://instagram.com/nixrajput
 [linkedin]: https://linkedin.com/in/nixrajput

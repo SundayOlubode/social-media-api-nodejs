@@ -162,12 +162,15 @@ exports.login = catchAsyncError(async (req, res, next) => {
     if (token) {
         let decodedData;
 
-        decodedData = jwt.verify(token, process.env.JWT_SECRET);
-        expiresAt = decodedData.exp;
+        decodedData = jwt.decode(token);
 
         if (decodedData.exp < new Date().getTime() / 1000) {
             token = user.generateToken();
             await user.save();
+            decodedData = jwt.verify(token, process.env.JWT_SECRET);
+            expiresAt = decodedData.exp;
+        }
+        else {
             decodedData = jwt.verify(token, process.env.JWT_SECRET);
             expiresAt = decodedData.exp;
         }

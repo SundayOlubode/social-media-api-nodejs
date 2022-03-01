@@ -104,9 +104,10 @@ userSchema.pre("save", async function (next) {
 // JWT Token
 userSchema.methods.generateToken = function () {
 
-    const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-    });
+    const token = jwt.sign({ id: this._id },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
 
     this.token = token;
 

@@ -22,9 +22,11 @@ app.use(fileUpload());
 // Routes
 const post = require("./routes/PostRoute");
 const user = require("./routes/UserRoute");
+const payment = require("./routes/PaymentRoute");
 
 app.use("/api/v1", post);
 app.use("/api/v1", user);
+app.use("/api/v1", payment);
 
 
 // Static file
