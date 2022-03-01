@@ -623,6 +623,33 @@ exports.getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Search User
+exports.searchUser = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.query.id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        user: {
+            _id: user._id,
+            fname: user.fname,
+            lname: user.lname,
+            email: user.email,
+            uname: user.uname,
+            phone: user.phone,
+            avatar: user.avatar,
+            gender: user.gender,
+            dob: user.dob
+        }
+    });
+
+});
+
+
 // Get All Users -- Admin
 exports.getAllUsers = catchAsyncError(async (req, res, next) => {
 

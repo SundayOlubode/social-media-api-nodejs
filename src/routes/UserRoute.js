@@ -16,14 +16,16 @@ const {
     updateUserRole,
     deleteUser,
     checkUsernameAvailability,
-    updateUsername
+    updateUsername,
+    searchUser
 } = require("../controllers/UserController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
 const router = express.Router();
 
 
-// Routes
+// Public Routes
+
 router.route("/register").post(register);
 
 router.route("/login").post(login);
@@ -31,6 +33,11 @@ router.route("/login").post(login);
 router.route("/logout").get(logout);
 
 router.route("/check/username").post(checkUsernameAvailability);
+
+router.route("/user").get(searchUser);
+
+
+// Authenticated Routes
 
 router.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
@@ -56,7 +63,7 @@ router.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 // Admin Routes
 
 router.route("/admin/users")
-.get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
+    .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
 
 router.route("/admin/user/:id")
     .get(isAuthenticatedUser, authorizeRoles("admin"), getUserProfileDetails)
