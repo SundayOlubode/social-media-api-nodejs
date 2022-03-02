@@ -1,6 +1,6 @@
-# nixlab-api-nodejs
+# social-media-api-nodejs
 
-An open-source API for User Authentication and User Profile Management developed using NodeJS, ExpressJS and MongoDB.
+An open-source RESTful API developed using NodeJS, ExpressJS and MongoDB helps you to integrate User Authentication and Social Media Post Management in your application with ease.
 
 ## Features
 
@@ -8,7 +8,17 @@ An open-source API for User Authentication and User Profile Management developed
 - Registration
 - Get Profile Details
 - Update Profile Details
+- Upload Profile Picture
 - Delete Profile
+- Add Post
+- Get Posts
+- Like/Unlike Post
+- Update Post
+- Delete Post
+- Add Comment
+- Get Comments
+- Like/Unlike Comment
+- Delete Comment
 
 ## Documentation
 

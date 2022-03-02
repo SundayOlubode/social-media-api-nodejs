@@ -1,6 +1,7 @@
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const Post = require("../models/PostModel");
 const User = require("../models/UserModel");
+const Comment = require("../models/CommentModel");
 const ErrorHandler = require("../utils/errorHandler");
 const cloudinary = require("cloudinary");
 
@@ -262,16 +263,25 @@ exports.getPostDetails = catchAsyncError(async (req, res, next) => {
 // Add Comment
 exports.addComment = catchAsyncError(async (req, res, next) => {
 
+    const { comment } = req.body;
+
+    if (!comment) {
+        return next(new ErrorHandler("Please enter a comment.", 400));
+    }
+
     const post = await Post.findById(req.params.id);
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
     }
 
-    post.comments.push({
+    const newComment = await Comment.create({
+        comment: comment,
         user: req.user._id,
-        comment: req.body.comment
+        post: post._id
     });
+
+    post.comments.push(newComment._id);
 
     await post.save();
 
@@ -283,29 +293,64 @@ exports.addComment = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Like/Unlike Commnet
+exports.likeAndUnlikeComment = catchAsyncError(async (req, res, next) => {
+
+    const comment = await Comment.findById(req.params.id);
+
+    if (!comment) {
+        return next(new ErrorHandler("Comment does not exist.", 404));
+    }
+
+    if (comment.likes.includes(req.user._id)) {
+        const index = comment.likes.indexOf(req.user._id);
+
+        comment.likes.splice(index, 1);
+
+        await comment.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Comment unliked."
+        });
+    }
+    else {
+        comment.likes.push(req.user._id);
+
+        await comment.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Comment liked."
+        });
+    }
+
+});
+
+
 // Delete Comment
 exports.deleteComment = catchAsyncError(async (req, res, next) => {
 
-    const { commentId } = req.body;
+    const comment = await Comment.findById(req.params.id);
 
-    if (!commentId) {
-        return next(new ErrorHandler("Comment Id is empty.", 400));
+    if (!comment) {
+        return next(new ErrorHandler("Comment does not exist.", 404));
     }
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(comment.post);
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
     }
-
-    const comment = post.comments.find(item => item._id.toString() === commentId);
 
     if (
         post.owner.toString() === req.user._id.toString() ||
         comment.user.toString() === req.user._id.toString()
     ) {
 
-        const commentIndex = post.comments.indexOf(commentId.toString());
+        await comment.remove();
+
+        const commentIndex = post.comments.indexOf(comment._id);
 
         post.comments.splice(commentIndex, 1);
 
@@ -320,5 +365,38 @@ exports.deleteComment = catchAsyncError(async (req, res, next) => {
     else {
         return next(new ErrorHandler("Unauthorized.", 401));
     }
+
+});
+
+
+// Get All Comments
+exports.getAllComments = catchAsyncError(async (req, res, next) => {
+
+    const comments = await Comment.find({
+        post: req.params.id
+    });
+
+    res.status(200).json({
+        success: true,
+        count: comments.length,
+        comments
+    })
+
+});
+
+
+// Get Comment Details
+exports.getCommentDetails = catchAsyncError(async (req, res, next) => {
+
+    const comment = await Comment.findById(req.params.id);
+
+    if (!comment) {
+        return next(new ErrorHandler("Comment not found.", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        comment
+    })
 
 });

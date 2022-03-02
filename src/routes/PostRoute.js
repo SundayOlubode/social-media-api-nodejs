@@ -8,7 +8,10 @@ const {
     getPostDetails,
     addComment,
     deleteComment,
-    getAllPosts
+    getAllPosts,
+    likeAndUnlikeComment,
+    getCommentDetails,
+    getAllComments
 } = require("../controllers/PostController");
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
@@ -29,8 +32,17 @@ router.route("/post/like/:id")
 
 router.route("/posts").get(isAuthenticatedUser, getFollowingPosts);
 
+router.route("/post/:id/comment/add")
+    .post(isAuthenticatedUser, addComment);
+
+router.route("/post/comment/like/:id")
+    .get(isAuthenticatedUser, likeAndUnlikeComment);
+
+router.route("/post/:id/comments")
+    .get(isAuthenticatedUser, getAllComments);
+
 router.route("/post/comment/:id")
-    .post(isAuthenticatedUser, addComment)
+    .get(isAuthenticatedUser, getCommentDetails)
     .delete(isAuthenticatedUser, deleteComment);
 
 
