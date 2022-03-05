@@ -25,8 +25,5 @@
     "nodemon": "^2.0.15",
     "razorpay": "^2.8.0",
     "validator": "^13.7.0"
-  },
-  "engines": {
-    "node": "14.x"
   }
 }

@@ -401,7 +401,7 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    if (Object.keys(user.avatar).length > 0) {
+    if (user.avatar && user.avatar.public_id) {
 
         const imageId = user.avatar.public_id;
 
