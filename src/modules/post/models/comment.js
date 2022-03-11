@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 
 const commentSchema = new mongoose.Schema({
-
     comment: {
         type: String,
         required: true
@@ -28,9 +27,9 @@ const commentSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    },
-
+    }
 })
 
 
+commentSchema.index({ user: true })
 module.exports = mongoose.model("Comment", commentSchema);

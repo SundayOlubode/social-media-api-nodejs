@@ -5,7 +5,6 @@ const crypto = require("crypto");
 
 
 const userSchema = new mongoose.Schema({
-
     fname: {
         type: String,
         minlength: [3, "First name must be at least 3 characters."],
@@ -52,6 +51,8 @@ const userSchema = new mongoose.Schema({
 
     dob: String,
 
+    about: String,
+
     posts: [
         {
             type: mongoose.Types.ObjectId,
@@ -83,17 +84,21 @@ const userSchema = new mongoose.Schema({
         default: "active"
     },
 
+    is_verified: {
+        type: Boolean,
+        default: false
+    },
+
     createdAt: {
         type: Date,
         default: Date.now
     },
 
     token: String,
+    expiresAt: String,
 
     resetPasswordToken: String,
-
     resetPasswordExpire: Date
-
 });
 
 
@@ -108,13 +113,14 @@ userSchema.pre("save", async function (next) {
 
 // JWT Token
 userSchema.methods.generateToken = function () {
-
     const token = jwt.sign({ id: this._id },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
+    const decodedData = jwt.decode(token);
     this.token = token;
+    this.expiresAt = decodedData.exp;
 
     return token;
 }
@@ -141,4 +147,5 @@ userSchema.methods.generatePasswordResetToken = function () {
 }
 
 
+userSchema.index({ uname: true })
 module.exports = mongoose.model("User", userSchema);

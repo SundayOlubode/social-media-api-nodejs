@@ -12,8 +12,8 @@ const {
     likeAndUnlikeComment,
     getCommentDetails,
     getAllComments
-} = require("../controllers/PostController");
-const { isAuthenticatedUser } = require("../middlewares/auth");
+} = require("../controllers");
+const { isAuthenticatedUser } = require("../../../middlewares/auth");
 
 const router = express.Router();
 

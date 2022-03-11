@@ -1,6 +1,6 @@
 const app = require("./app");
-const { connectDatabase } = require("./config/database");
 const cloudinary = require("cloudinary");
+const connectMongoDB = require('./helpers/connect-db');
 
 
 // Handling Uncaught Exception
@@ -24,10 +24,6 @@ if (process.env.NODE_ENV !== "prod") {
 }
 
 
-// Connecting to DB
-connectDatabase();
-
-
 // Cloudinary Setup
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -36,9 +32,20 @@ cloudinary.config({
 });
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`)
-})
+(async () => {
+    // Connecting to DB
+    await connectMongoDB(process.env.MONGO_URI, 'nixlab-db');
+
+    // Running server
+    app.listen(process.env.PORT, (err) => {
+
+        if (err) {
+            console.log(`[server] could not start http server on port: ${PORT}`);
+            return;
+        }
+        console.log(`[server] running on port: ${process.env.PORT}`)
+    });
+})();
 
 
 // Unhandled Promise Rejection

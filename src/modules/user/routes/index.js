@@ -19,8 +19,8 @@ const {
     updateUsername,
     searchUser,
     updateAccountStatus
-} = require("../controllers/UserController");
-const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
+} = require("../controllers");
+const { isAuthenticatedUser, authorizeRoles } = require("../../../middlewares/auth");
 
 const router = express.Router();
 

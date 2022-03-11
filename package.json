@@ -2,10 +2,10 @@
   "name": "social-mern",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "./src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "dev": "nodemon ./src/server.js",
+    "start": "node ./src/server.js"
   },
   "author": "Nix Rajput",
   "license": "GPL-3.0",

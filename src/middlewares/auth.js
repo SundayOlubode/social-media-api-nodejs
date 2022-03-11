@@ -1,8 +1,7 @@
-const ErrorHandler = require("../utils/errorHandler");
-const catchAsyncError = require("./catchAsyncError");
+const ErrorHandler = require("../helpers/errorHandler");
+const catchAsyncError = require("../helpers/catchAsyncError");
 const jwt = require("jsonwebtoken");
-const User = require("../models/UserModel");
-
+const User = require("../modules/user/models/user");
 
 
 // Authenticated User
@@ -27,7 +26,7 @@ exports.isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
         next();
     }
     else {
-        return next(new ErrorHandler("Auth token not found.", 400));
+        return next(new ErrorHandler("Auth token not found in headers.", 400));
     }
 
 })
@@ -39,7 +38,7 @@ exports.authorizeRoles = (...roles) => {
     return (req, res, next) => {
 
         if (!roles.includes(req.user.role)) {
-            return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource.`, 403));
+            return next(new ErrorHandler(`User is not allowed to access this resource.`, 403));
         }
 
         next();

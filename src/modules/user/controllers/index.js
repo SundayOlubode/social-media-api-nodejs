@@ -1,12 +1,12 @@
-const catchAsyncError = require("../middlewares/catchAsyncError");
-const User = require("../models/UserModel");
-const Post = require("../models/PostModel");
-const ErrorHandler = require("../utils/errorHandler");
-const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 const jwt = require("jsonwebtoken");
-const { validateEmail, validateUsername } = require("../utils/validations");
+const catchAsyncError = require("../../../helpers/catchAsyncError");
+const ErrorHandler = require("../../../helpers/errorHandler");
+const sendEmail = require("../../../helpers/sendEmail");
+const User = require("../models/user");
+const Post = require("../../post/models/post");
+const { validateEmail, validateUsername } = require("../../../utils/validators");
 
 
 // Register User
@@ -87,13 +87,13 @@ exports.register = catchAsyncError(async (req, res, next) => {
 
     const token = user.generateToken();
     await user.save();
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedData = jwt.decode(token);
     const expiresAt = decodedData.exp;
 
     const message = `Hello ${user.fname},
     \nWelcome to NixLab Technologies. We're glad you're here!
     \n\nThank you for joining with us.
-    \n\nThank You,\nNixLab Technologies Team`;
+    \n\nRegards,\nNixLab Technologies Team`;
 
     try {
         await sendEmail({
@@ -157,28 +157,20 @@ exports.login = catchAsyncError(async (req, res, next) => {
     }
 
     let token = user.token;
-    let expiresAt;
+    let expiresAt = user.expiresAt;
 
-    if (token) {
-        let decodedData;
-
-        decodedData = jwt.decode(token);
-
-        if (decodedData.exp < new Date().getTime() / 1000) {
+    if (token && expiresAt) {
+        if (expiresAt < new Date().getTime() / 1000) {
             token = user.generateToken();
             await user.save();
-            decodedData = jwt.verify(token, process.env.JWT_SECRET);
-            expiresAt = decodedData.exp;
-        }
-        else {
-            decodedData = jwt.verify(token, process.env.JWT_SECRET);
+            const decodedData = jwt.verify(token, process.env.JWT_SECRET);
             expiresAt = decodedData.exp;
         }
     }
     else {
         token = user.generateToken();
         await user.save();
-        decodedData = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedData = jwt.verify(token, process.env.JWT_SECRET);
         expiresAt = decodedData.exp;
     }
 
@@ -195,6 +187,17 @@ exports.login = catchAsyncError(async (req, res, next) => {
 
 // Logout User
 exports.logout = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.user._id);
+
+    if (!userToFollow) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    user.token = undefined;
+    user.expiresAt = undefined;
+
+    await user.save();
 
     res.status(200).json({
         success: true,
@@ -380,6 +383,7 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
+    user.generateToken();
     await user.save();
 
     res.status(200).json({
@@ -402,11 +406,8 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (user.avatar && user.avatar.public_id) {
-
         const imageId = user.avatar.public_id;
-
         await cloudinary.v2.uploader.destroy(imageId);
-
     }
 
     await cloudinary.v2.uploader
@@ -440,7 +441,7 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 // Update User Profile
 exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
-    const { fname, lname, phone, gender, dob } = req.body;
+    const { fname, lname, phone, gender, dob, about } = req.body;
 
     const user = await User.findById(req.user._id);
 
@@ -477,6 +478,10 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     if (dob) {
         user.dob = dob;
+    }
+
+    if (about) {
+        user.about = about;
     }
 
     await user.save();

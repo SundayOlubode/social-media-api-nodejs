@@ -1,9 +1,9 @@
-const catchAsyncError = require("../middlewares/catchAsyncError");
-const Post = require("../models/PostModel");
-const User = require("../models/UserModel");
-const Comment = require("../models/CommentModel");
-const ErrorHandler = require("../utils/errorHandler");
 const cloudinary = require("cloudinary");
+const catchAsyncError = require("../../../helpers/catchAsyncError");
+const Post = require("../models/post");
+const User = require("../../user/models/user");
+const Comment = require("../models/comment");
+const ErrorHandler = require("../../../helpers/errorHandler");
 
 
 // Create Post
