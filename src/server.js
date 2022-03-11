@@ -5,14 +5,12 @@ const connectMongoDB = require('./helpers/connect-db');
 
 // Handling Uncaught Exception
 process.on("uncaughtException", err => {
-
     console.log(`Error: ${err.message}`);
-    console.log(`Shutting down the server due to Uncaught Exception`);
+    console.log(`[server] shutting down due to Uncaught Exception`);
 
     server.close(() => {
         process.exit(1);
     })
-
 });
 
 
@@ -52,7 +50,7 @@ cloudinary.config({
 process.on("unhandledRejection", err => {
 
     console.log(`Error: ${err.message}`);
-    console.log(`Shutting down the server due to Unhandled Promise Rejection`);
+    console.log(`[server] shutting down due to Unhandled Promise Rejection`);
 
     server.close(() => {
         process.exit(1);
