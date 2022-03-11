@@ -34,7 +34,7 @@ cloudinary.config({
 
 (async () => {
     // Connecting to DB
-    await connectMongoDB(process.env.MONGO_URI, 'nixlab-db');
+    await connectMongoDB(process.env.MONGO_URI, process.env.DB_NAME);
 
     // Running server
     app.listen(process.env.PORT, (err) => {
