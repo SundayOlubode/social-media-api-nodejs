@@ -1,4 +1,3 @@
-const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 const jwt = require("jsonwebtoken");
 const catchAsyncError = require("../../../helpers/catchAsyncError");
@@ -6,7 +5,36 @@ const ErrorHandler = require("../../../helpers/errorHandler");
 const sendEmail = require("../../../helpers/sendEmail");
 const User = require("../models/user");
 const Post = require("../../post/models/post");
+const OTP = require("../models/otp");
+const generateOTP = require('./generateOTP');
 const { validateEmail, validateUsername } = require("../../../utils/validators");
+const dates = require('./dateFunc');
+
+
+// Check Username Availability
+const checkUsernameAvailable = async (uname) => {
+    let user = await User.findOne({ uname });
+
+    if (user) {
+        return false;
+    }
+
+    return true;
+}
+
+
+// Delete All expired OTPs
+exports.deleteExpiredOTPs = async () => {
+    const otps = await OTP.find();
+
+    for (let i = 0; i < otps.length; i++) {
+        if (dates.compare(otps[i].expiresAt, new Date()) === -1) {
+            await otps[i].remove();
+        }
+    }
+
+    console.log("[cron] task has deleted expired OTPs.")
+}
 
 
 // Register User
@@ -85,21 +113,23 @@ exports.register = catchAsyncError(async (req, res, next) => {
         password
     });
 
-    const token = user.generateToken();
+    const token = await user.generateToken();
     await user.save();
     const decodedData = jwt.decode(token);
     const expiresAt = decodedData.exp;
 
-    const message = `Hello ${user.fname},
-    \nWelcome to NixLab Technologies. We're glad you're here!
-    \n\nThank you for joining with us.
-    \n\nRegards,\nNixLab Technologies Team`;
+    const htmlMessage = `<p>Hello ${user.fname},</p>
+    <h2>Welcome to NixLab Technologies.</h2>
+    <p>We're glad you're here!</p>
+    <p>This is a auto-generated email. Please do not reply to this email.</p>
+    <p>Regards, <br>
+    NixLab Technologies Team</p>`
 
     try {
         await sendEmail({
             email: user.email,
             subject: `Welcome to NixLab Technologies`,
-            message: message
+            htmlMessage: htmlMessage
         });
     } catch (err) {
         console.log(err.message);
@@ -113,18 +143,6 @@ exports.register = catchAsyncError(async (req, res, next) => {
     });
 
 });
-
-
-// Check Username Availability
-const checkUsernameAvailable = async (uname) => {
-    let user = await User.findOne({ uname });
-
-    if (user) {
-        return false;
-    }
-
-    return true;
-}
 
 
 // Login User
@@ -161,14 +179,14 @@ exports.login = catchAsyncError(async (req, res, next) => {
 
     if (token && expiresAt) {
         if (expiresAt < new Date().getTime() / 1000) {
-            token = user.generateToken();
+            token = await user.generateToken();
             await user.save();
             const decodedData = jwt.verify(token, process.env.JWT_SECRET);
             expiresAt = decodedData.exp;
         }
     }
     else {
-        token = user.generateToken();
+        token = await user.generateToken();
         await user.save();
         const decodedData = jwt.verify(token, process.env.JWT_SECRET);
         expiresAt = decodedData.exp;
@@ -270,13 +288,17 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
 
     const { oldPassword, newPassword, confirmPassword } = req.body;
 
-    if (!oldPassword || !newPassword || !confirmPassword) {
-        return next(new ErrorHandler("Please provide old password, new password and confirm password.", 400));
+    if (!oldPassword) {
+        return next(new ErrorHandler("Please enter old password.", 400));
     }
 
-    const user = await User.findById(req.user._id).select("+password");
+    if (!newPassword) {
+        return next(new ErrorHandler("Please enter new password.", 400));
+    }
 
-    const isPasswordMatched = await user.matchPassword(oldPassword);
+    if (!confirmPassword) {
+        return next(new ErrorHandler("Please enter confirm password.", 400));
+    }
 
     if (!isPasswordMatched) {
         return next(new ErrorHandler("Old password is incorrect.", 400));
@@ -286,8 +308,13 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("New passwords do not matched.", 400));
     }
 
+    const user = await User.findById(req.user._id).select("+password");
+
+    const isPasswordMatched = await user.matchPassword(oldPassword);
+
     user.password = newPassword;
 
+    await user.generateToken();
     await user.save();
 
     res.status(200).json({
@@ -310,43 +337,43 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-        return next(new ErrorHandler("User not found.", 404));
+        return next(new ErrorHandler("User does not exist.", 404));
     }
 
-    const resetToken = user.generatePasswordResetToken();
+    // Generating OTP
+    const { otp, expiresAt } = await generateOTP();
+
+    const otpObj = await OTP.create({
+        otp,
+        expiresAt
+    });
+
+    user.otp = otpObj._id;
 
     await user.save();
 
-    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/reset/password/${resetToken}`;
-
-    const message = `Hello ${user.fname},
-    \nYour password reset link is :- \n ${resetPasswordUrl}
-    \nThis link is valid for only 15 minutes.
-    \nIf you have not requested this email then, please ignore it.
-    \n\nThank You,\nNixLab Technologies Team`;
+    const htmlMessage = `<p>Hello ${user.fname},</p>
+    <br><p>Your password reset OTP is: </p>
+    <br><h1>${otp}</h1><br>
+    <p>This OTP is valid for only 15 minutes.</p>
+    <p>If you have not requested this email then, please ignore it.</p>
+    <p>This is a auto-generated email. Please do not reply to this email.</p>
+    <p>Regards, <br>
+    NixLab Technologies Team</p>`
 
     try {
-
         await sendEmail({
             email: user.email,
-            subject: `Account Password Recovery`,
-            message: message
+            subject: `OTP for Password Reset`,
+            htmlMessage: htmlMessage
         });
 
         res.status(200).json({
             success: true,
-            message: `Email sent to ${user.email}.`
+            message: "OTP sent."
         });
-
     } catch (err) {
-
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
-
-        await user.save();
-
         return next(new ErrorHandler(err.message, 500));
-
     }
 
 });
@@ -355,41 +382,61 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 // Reset Password
 exports.resetPassword = catchAsyncError(async (req, res, next) => {
 
-    const { newPassword, confirmPassword } = req.body;
+    const { otp, newPassword, confirmPassword } = req.body;
 
-    if (!newPassword || !confirmPassword) {
-        return next(new ErrorHandler("Please enter new password and confirm password.", 400));
+    if (!otp) {
+        return next(new ErrorHandler("Please enter OTP.", 400));
     }
 
-    const token = req.params.token;
+    if (!newPassword) {
+        return next(new ErrorHandler("Please enter new password.", 400));
+    }
 
-    const resetPasswordToken = crypto.createHash("sha256")
-        .update(token).digest("hex");
-
-    const user = await User.findOne({
-        resetPasswordToken,
-        resetPasswordExpire: { $gt: Date.now() }
-    });
-
-    if (!user) {
-        return next(new ErrorHandler("Token is invalid or expired.", 401));
+    if (!confirmPassword) {
+        return next(new ErrorHandler("Please enter confirm password.", 400));
     }
 
     if (newPassword !== confirmPassword) {
-        return next(new ErrorHandler("Passwords do not matched.", 400));
+        return next(new ErrorHandler("Both Passwords do not matched.", 400));
     }
 
-    user.password = newPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
+    const otpObj = await OTP.findOne({ otp });
 
-    user.generateToken();
-    await user.save();
+    if (!otpObj) {
+        return next(new ErrorHandler("OTP is invalid.", 401))
+    }
 
-    res.status(200).json({
-        success: true,
-        message: "Password changed."
-    });
+    if (otpObj.isVerified === true) {
+        return next(new ErrorHandler("OTP is already used.", 401))
+    }
+
+    if (dates.compare(otpObj.expiresAt, new Date()) === 1) {
+
+        const user = await User.findOne({
+            otp: otpObj._id
+        });
+
+        if (!user) {
+            return next(new ErrorHandler("OTP is invalid or expired.", 401));
+        }
+
+        user.password = newPassword;
+        user.otp = undefined;
+        otpObj.isVerified = true;
+
+        await user.generateToken();
+        await otpObj.save();
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password updated."
+        });
+
+    }
+    else {
+        return next(new ErrorHandler("OTP is expired.", 401));
+    }
 
 });
 

@@ -30,18 +30,20 @@ cloudinary.config({
 });
 
 
+const port = process.env.PORT || 4000;
+
 (async () => {
     // Connecting to DB
     await connectMongoDB(process.env.MONGO_URI, process.env.DB_NAME);
 
     // Running server
-    app.listen(process.env.PORT, (err) => {
+    app.listen(port, (err) => {
 
         if (err) {
             console.log(`[server] could not start http server on port: ${PORT}`);
             return;
         }
-        console.log(`[server] running on port: ${process.env.PORT}`)
+        console.log(`[server] running on port: ${port}`)
     });
 })();
 
