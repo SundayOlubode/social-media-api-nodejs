@@ -26,7 +26,6 @@ const router = express.Router();
 
 
 // Public Routes
-
 router.route("/register").post(register);
 
 router.route("/login").post(login);
@@ -39,7 +38,6 @@ router.route("/user").get(searchUser);
 
 
 // Authenticated Routes
-
 router.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
 router.route("/follow/:id").get(isAuthenticatedUser, followUser);
@@ -62,7 +60,6 @@ router.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
 
 // Admin Routes
-
 router.route("/admin/users")
     .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
 

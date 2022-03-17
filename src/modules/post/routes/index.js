@@ -19,7 +19,6 @@ const router = express.Router();
 
 
 // Routes
-
 router.route("/post/create").post(isAuthenticatedUser, createPost);
 
 router.route("/post/:id")
@@ -47,7 +46,6 @@ router.route("/post/comment/:id")
 
 
 // Admin Routes
-
 router.route("/admin/posts").get(isAuthenticatedUser, getAllPosts);
 
 

@@ -1,7 +1,9 @@
-const app = require("./app");
 const cloudinary = require("cloudinary");
 const connectMongoDB = require('./helpers/connect-db');
+const { runApp, closeApp } = require("./app");
+const initModules = require("./initModules");
 
+const app = runApp();
 
 // Config
 if (process.env.NODE_ENV !== "prod") {
@@ -18,17 +20,19 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-
-const port = process.env.PORT || 4000;
-
-let server;
-
+// Starting Server
 (async () => {
     // Connecting to DB
     await connectMongoDB(process.env.MONGO_URI, process.env.DB_NAME);
 
-    // Running server
-    server = app.listen(port, (err) => {
+    // Init Modules
+    initModules(app);
+
+    // Error Handler
+    closeApp(app);
+
+    const port = process.env.PORT;
+    const server = app.listen(port, (err) => {
 
         if (err) {
             console.log(`[server] could not start http server on port: ${port}`);
@@ -36,28 +40,29 @@ let server;
         }
         console.log(`[server] running on port: ${port}`)
     });
+
+
+    // Handling Uncaught Exception
+    process.on("uncaughtException", err => {
+        console.log(`Error: ${err.message}`);
+        console.log(`[server] shutting down due to Uncaught Exception`);
+
+        server.close(() => {
+            process.exit(1);
+        })
+    });
+
+
+    // Unhandled Promise Rejection
+    process.on("unhandledRejection", err => {
+
+        console.log(`Error: ${err.message}`);
+        console.log(`[server] shutting down due to Unhandled Promise Rejection`);
+
+        server.close(() => {
+            process.exit(1);
+        })
+
+    });
+
 })();
-
-
-// Handling Uncaught Exception
-process.on("uncaughtException", err => {
-    console.log(`Error: ${err.message}`);
-    console.log(`[server] shutting down due to Uncaught Exception`);
-
-    server.close(() => {
-        process.exit(1);
-    })
-});
-
-
-// Unhandled Promise Rejection
-process.on("unhandledRejection", err => {
-
-    console.log(`Error: ${err.message}`);
-    console.log(`[server] shutting down due to Unhandled Promise Rejection`);
-
-    server.close(() => {
-        process.exit(1);
-    })
-
-});
