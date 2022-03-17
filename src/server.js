@@ -5,23 +5,22 @@ const initModules = require("./initModules");
 
 const app = runApp();
 
-// Config
-if (process.env.NODE_ENV !== "prod") {
-    require("dotenv").config({
-        path: "src/config/config.env"
-    });
-}
-
-
-// Cloudinary Setup
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
 // Starting Server
 (async () => {
+    // Config
+    if (process.env.NODE_ENV !== "prod") {
+        require("dotenv").config({
+            path: "src/config/config.env"
+        });
+    }
+
+    // Cloudinary Setup
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+
     // Connecting to DB
     await connectMongoDB(process.env.MONGO_URI, process.env.DB_NAME);
 
@@ -31,6 +30,7 @@ cloudinary.config({
     // Error Handler
     closeApp(app);
 
+    
     const port = process.env.PORT;
     const server = app.listen(port, (err) => {
 
@@ -55,14 +55,12 @@ cloudinary.config({
 
     // Unhandled Promise Rejection
     process.on("unhandledRejection", err => {
-
         console.log(`Error: ${err.message}`);
         console.log(`[server] shutting down due to Unhandled Promise Rejection`);
 
         server.close(() => {
             process.exit(1);
         })
-
     });
 
 })();

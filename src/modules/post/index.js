@@ -1,10 +1,9 @@
 const postRoutes = require('./routes');
 
-const router = ("/api/v1", postRoutes);
 
 const postModule = {
     init: (app) => {
-        app.use(router);
+        app.use("/api/v1", postRoutes);
         console.log('[module]: post module loaded');
     }
 }

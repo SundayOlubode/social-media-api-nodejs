@@ -1,10 +1,9 @@
 const userRoutes = require('./routes');
 
-const router = ("/api/v1", userRoutes);
 
 const userModule = {
     init: (app) => {
-        app.use(router);
+        app.use("/api/v1", userRoutes);
         console.log('[module]: user module loaded');
     }
 }
