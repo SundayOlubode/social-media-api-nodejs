@@ -18,7 +18,9 @@ const {
     checkUsernameAvailability,
     updateUsername,
     searchUser,
-    updateAccountStatus
+    updateAccountStatus,
+    sendVerificationEmail,
+    verifyAccount
 } = require("../controllers");
 const { isAuthenticatedUser, authorizeRoles } = require("../../../middlewares/auth");
 
@@ -34,8 +36,6 @@ router.route("/logout").get(logout);
 
 router.route("/check/username").post(checkUsernameAvailability);
 
-router.route("/user").get(searchUser);
-
 
 // Authenticated Routes
 router.route("/me").get(isAuthenticatedUser, getProfileDetails);
@@ -48,6 +48,10 @@ router.route("/forgot/password").post(forgotPassword);
 
 router.route("/reset/password").put(resetPassword);
 
+router.route("/verify/me")
+    .get(isAuthenticatedUser, sendVerificationEmail)
+    .put(isAuthenticatedUser, verifyAccount);
+
 router.route("/update/me").put(isAuthenticatedUser, updateUserProfile);
 
 router.route("/update/username").put(isAuthenticatedUser, updateUsername);
@@ -57,6 +61,8 @@ router.route("/avatar/me").put(isAuthenticatedUser, uploadAvatar);
 router.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
 
 router.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
+
+router.route("/user").get(isAuthenticatedUser, searchUser);
 
 
 // Admin Routes

@@ -542,6 +542,105 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Send Verification Email
+exports.sendVerificationEmail = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        return next(new ErrorHandler("User does not exist.", 404));
+    }
+
+    // Generating OTP
+    const { otp, expiresAt } = await generateOTP({ expireTimeInMin: 5 });
+
+    const otpObj = await OTP.create({
+        otp,
+        expiresAt
+    });
+
+    user.otp = otpObj._id;
+
+    await user.save();
+
+    const htmlMessage = `<p>Hello ${user.fname},</p>
+    <br><p>Your OTP for verification is: </p>
+    <br><h1>${otp}</h1><br>
+    <p>This OTP is valid for only 15 minutes.</p>
+    <p>If you have not requested this email then, please ignore it.</p>
+    <p>This is a auto-generated email. Please do not reply to this email.</p>
+    <p>Regards, <br>
+    NixLab Technologies Team</p>`
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: `Verify Your Account`,
+            htmlMessage: htmlMessage
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "OTP sent."
+        });
+    } catch (err) {
+        return next(new ErrorHandler(err.message, 500));
+    }
+
+});
+
+
+// Verify Account
+exports.verifyAccount = catchAsyncError(async (req, res, next) => {
+
+    const { otp } = req.body;
+
+    if (!otp) {
+        return next(new ErrorHandler("Please enter OTP.", 400));
+    }
+
+    const otpObj = await OTP.findOne({ otp });
+
+    if (!otpObj) {
+        return next(new ErrorHandler("OTP is invalid.", 401))
+    }
+
+    if (otpObj.isVerified === true) {
+        return next(new ErrorHandler("OTP is already used.", 401))
+    }
+
+    if (dates.compare(otpObj.expiresAt, new Date()) === 1) {
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return next(new ErrorHandler("User does not exist.", 404));
+        }
+
+        if (otpObj._id.toString() === user.otp.toString()) {
+            user.is_verified = true;
+            user.otp = undefined;
+            otpObj.isVerified = true;
+
+            await otpObj.save();
+            await user.save();
+
+            res.status(200).json({
+                success: true,
+                message: "User account verified."
+            });
+        }
+        else {
+            return next(new ErrorHandler("OTP is invalid or expired.", 401));
+        }
+    }
+    else {
+        return next(new ErrorHandler("OTP is expired.", 401));
+    }
+
+});
+
+
 // Check Username Availabilty
 exports.checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
 
