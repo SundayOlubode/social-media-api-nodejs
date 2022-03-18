@@ -1,7 +1,7 @@
 const optGenerator = require('otp-generator');
 
 
-const generateOTP = async ({ size, expireTimeInMin }) => {
+const generateOTP = async (size = 6, expireTimeInMin = 15) => {
 
     const options = {
         lowerCaseAlphabets: false,
@@ -10,10 +10,10 @@ const generateOTP = async ({ size, expireTimeInMin }) => {
     };
 
     // Generating Token
-    const otp = optGenerator.generate(size || 6, options);
+    const otp = optGenerator.generate(size, options);
 
     // Valid for 15 minutes
-    const expiresAt = Date.now() + (expireTimeInMin || 15) * 60 * 1000;
+    const expiresAt = Date.now() + expireTimeInMin * 60 * 1000;
 
     return { otp, expiresAt };
 }
