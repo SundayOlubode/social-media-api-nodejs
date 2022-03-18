@@ -83,7 +83,7 @@ const userSchema = new mongoose.Schema({
         default: "active"
     },
 
-    is_verified: {
+    isVerified: {
         type: Boolean,
         default: false
     },

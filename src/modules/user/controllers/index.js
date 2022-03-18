@@ -618,7 +618,21 @@ exports.verifyAccount = catchAsyncError(async (req, res, next) => {
         }
 
         if (otpObj._id.toString() === user.otp.toString()) {
-            user.is_verified = true;
+
+            if (user.isVerified === false) {
+                user.isVerified = true;
+                user.otp = undefined;
+                otpObj.isVerified = true;
+
+                await otpObj.save();
+                await user.save();
+
+                res.status(200).json({
+                    success: true,
+                    message: "User account verified."
+                });
+            }
+
             user.otp = undefined;
             otpObj.isVerified = true;
 
@@ -627,8 +641,9 @@ exports.verifyAccount = catchAsyncError(async (req, res, next) => {
 
             res.status(200).json({
                 success: true,
-                message: "User account verified."
+                message: "Already verified."
             });
+
         }
         else {
             return next(new ErrorHandler("OTP is invalid or expired.", 401));
