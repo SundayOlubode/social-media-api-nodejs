@@ -552,7 +552,7 @@ exports.sendVerificationEmail = catchAsyncError(async (req, res, next) => {
     }
 
     // Generating OTP
-    const { otp, expiresAt } = await generateOTP({ expireTimeInMin: 5 });
+    const { otp, expiresAt } = await generateOTP();
 
     const otpObj = await OTP.create({
         otp,
