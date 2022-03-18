@@ -791,10 +791,7 @@ exports.searchUser = catchAsyncError(async (req, res, next) => {
             lname: user.lname,
             email: user.email,
             uname: user.uname,
-            phone: user.phone,
-            avatar: user.avatar,
-            gender: user.gender,
-            dob: user.dob
+            accountStatus: user.accountStatus
         }
     });
 
