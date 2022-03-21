@@ -218,7 +218,11 @@ exports.getFollowingPosts = catchAsyncError(async (req, res, next) => {
         owner: {
             $in: user.following
         }
-    })
+    }).sort({ createdAt: -1 })
+        .populate(
+            "owner",
+            ["_id", "fname", "lname", "email", "uname", "avatar"]
+        );
 
     res.status(200).json({
         success: true,
@@ -232,7 +236,12 @@ exports.getFollowingPosts = catchAsyncError(async (req, res, next) => {
 // Get All Posts
 exports.getAllPosts = catchAsyncError(async (req, res, next) => {
 
-    const posts = await Post.find();
+    const posts = await Post.find()
+        .sort({ createdAt: -1 })
+        .populate(
+            "owner",
+            ["_id", "fname", "lname", "email", "uname", "avatar"]
+        );
 
     res.status(200).json({
         success: true,
@@ -246,7 +255,11 @@ exports.getAllPosts = catchAsyncError(async (req, res, next) => {
 // Get Post Details
 exports.getPostDetails = catchAsyncError(async (req, res, next) => {
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id)
+        .populate(
+            "owner",
+            ["_id", "fname", "lname", "email", "uname", "avatar"]
+        );
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
