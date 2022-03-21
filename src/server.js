@@ -31,7 +31,7 @@ const app = runApp();
     closeApp(app);
 
     
-    const port = process.env.PORT;
+    const port = process.env.PORT || 4000;
     const server = app.listen(port, (err) => {
 
         if (err) {
