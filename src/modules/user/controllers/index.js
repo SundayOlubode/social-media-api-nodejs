@@ -79,20 +79,20 @@ exports.register = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Please enter a valid username.", 400));
     }
 
-    if (uname) {
-        const isUsernameAvailable = await checkUsernameAvailable(uname);
-
-        if (!isUsernameAvailable) {
-            return next(new ErrorHandler("Username not available.", 400));
-        }
-    }
-
     if (!password) {
         return next(new ErrorHandler("Please enter a password.", 400));
     }
 
     if (!confirmPassword) {
         return next(new ErrorHandler("Please enter the password again.", 400));
+    }
+
+    if (uname) {
+        const isUsernameAvailable = await checkUsernameAvailable(uname);
+
+        if (!isUsernameAvailable) {
+            return next(new ErrorHandler("Username not available.", 400));
+        }
     }
 
     if (password !== confirmPassword) {
