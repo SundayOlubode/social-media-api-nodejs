@@ -300,10 +300,6 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Please enter confirm password.", 400));
     }
 
-    if (!isPasswordMatched) {
-        return next(new ErrorHandler("Old password is incorrect.", 400));
-    }
-
     if (newPassword !== confirmPassword) {
         return next(new ErrorHandler("New passwords do not matched.", 400));
     }
@@ -311,6 +307,10 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id).select("+password");
 
     const isPasswordMatched = await user.matchPassword(oldPassword);
+
+    if (!isPasswordMatched) {
+        return next(new ErrorHandler("Old password is incorrect.", 400));
+    }
 
     user.password = newPassword;
 
