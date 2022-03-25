@@ -34,6 +34,10 @@ router.route("/login").post(login);
 
 router.route("/logout").get(logout);
 
+router.route("/forgot/password").post(forgotPassword);
+
+router.route("/reset/password").put(resetPassword);
+
 router.route("/check/username").post(checkUsernameAvailability);
 
 
@@ -43,10 +47,6 @@ router.route("/me").get(isAuthenticatedUser, getProfileDetails);
 router.route("/follow/:id").get(isAuthenticatedUser, followUser);
 
 router.route("/update/password").put(isAuthenticatedUser, updatePassword);
-
-router.route("/forgot/password").post(forgotPassword);
-
-router.route("/reset/password").put(resetPassword);
 
 router.route("/verify/me")
     .get(isAuthenticatedUser, sendVerificationEmail)

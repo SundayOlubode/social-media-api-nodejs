@@ -678,7 +678,7 @@ exports.checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
         });
     }
     else {
-        res.status(200).json({
+        res.status(400).json({
             success: false,
             message: "Username not available."
         });
@@ -718,7 +718,7 @@ exports.updateUsername = catchAsyncError(async (req, res, next) => {
         });
     }
     else {
-        res.status(200).json({
+        res.status(400).json({
             success: false,
             message: "Username not available."
         });
