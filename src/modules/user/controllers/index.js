@@ -813,6 +813,20 @@ exports.searchUser = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Get Random 10 Users
+exports.getRandomUsers = catchAsyncError(async (req, res, next) => {
+
+    const users = await User.find().limit(5).skip(Math.random() * 5);
+
+    res.status(200).json({
+        success: true,
+        count: users.length,
+        results: users
+    });
+
+});
+
+
 // Get All Users -- Admin
 exports.getAllUsers = catchAsyncError(async (req, res, next) => {
 

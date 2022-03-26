@@ -20,7 +20,8 @@ const {
     searchUser,
     updateAccountStatus,
     sendVerificationEmail,
-    verifyAccount
+    verifyAccount,
+    getRandomUsers
 } = require("../controllers");
 const { isAuthenticatedUser, authorizeRoles } = require("../../../middlewares/auth");
 
@@ -63,6 +64,9 @@ router.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
 router.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
 router.route("/user").get(isAuthenticatedUser, searchUser);
+
+router.route("/users")
+    .get(isAuthenticatedUser, getRandomUsers);
 
 
 // Admin Routes
