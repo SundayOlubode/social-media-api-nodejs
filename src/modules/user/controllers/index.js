@@ -1,18 +1,20 @@
-const cloudinary = require("cloudinary");
-const jwt = require("jsonwebtoken");
-const catchAsyncError = require("../../../helpers/catchAsyncError");
-const ErrorHandler = require("../../../helpers/errorHandler");
-const sendEmail = require("../../../helpers/sendEmail");
-const User = require("../models/user");
-const Post = require("../../post/models/post");
-const OTP = require("../models/otp");
-const generateOTP = require('./generateOTP');
-const { validateEmail, validateUsername } = require("../../../utils/validators");
-const dates = require('./dateFunc');
+import cloudinary from 'cloudinary';
+import jwt from 'jsonwebtoken';
+import catchAsyncError from '../../../helpers/catchAsyncError.js';
+import ErrorHandler from '../../../helpers/errorHandler.js';
+import sendEmail from '../../../helpers/sendEmail.js';
+import User from '../models/user.js';
+import Post from '../../post/models/post.js';
+import OTP from '../models/otp.js';
+import {
+    validateEmail, validateUsername
+} from '../../../utils/validators.js';
+import dates from '../helpers/dateFunc.js';
+import generateOTP from '../helpers/generateOTP.js';
 
 
 // Check Username Availability
-const checkUsernameAvailable = async (uname) => {
+export const checkUsernameAvailable = async (uname) => {
     let user = await User.findOne({ uname });
 
     if (user) {
@@ -24,7 +26,7 @@ const checkUsernameAvailable = async (uname) => {
 
 
 // Delete All expired OTPs
-exports.deleteExpiredOTPs = async () => {
+export const deleteExpiredOTPs = async () => {
     const otps = await OTP.find();
 
     for (let i = 0; i < otps.length; i++) {
@@ -38,9 +40,12 @@ exports.deleteExpiredOTPs = async () => {
 
 
 // Register User
-exports.register = catchAsyncError(async (req, res, next) => {
+export const register = catchAsyncError(async (req, res, next) => {
 
-    const { fname, lname, email, uname, password, confirmPassword } = req.body;
+    const {
+        fname, lname, email, uname,
+        password, confirmPassword
+    } = req.body;
 
     // Input Validation
     if (!fname) {
@@ -113,10 +118,8 @@ exports.register = catchAsyncError(async (req, res, next) => {
         password
     });
 
-    const token = await user.generateToken();
+    await user.generateToken();
     await user.save();
-    const decodedData = jwt.decode(token);
-    const expiresAt = decodedData.exp;
 
     const htmlMessage = `<p>Hello ${user.fname},</p>
     <h2>Welcome to NixLab Technologies.</h2>
@@ -144,7 +147,7 @@ exports.register = catchAsyncError(async (req, res, next) => {
 
 
 // Login User
-exports.login = catchAsyncError(async (req, res, next) => {
+export const login = catchAsyncError(async (req, res, next) => {
 
     const { email, password } = req.body;
 
@@ -202,11 +205,11 @@ exports.login = catchAsyncError(async (req, res, next) => {
 
 
 // Logout User
-exports.logout = catchAsyncError(async (req, res, next) => {
+export const logout = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    if (!userToFollow) {
+    if (!user) {
         return next(new ErrorHandler("User not found.", 404));
     }
 
@@ -224,7 +227,7 @@ exports.logout = catchAsyncError(async (req, res, next) => {
 
 
 // Get Profile Details
-exports.getProfileDetails = catchAsyncError(async (req, res, next) => {
+export const getProfileDetails = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id).populate("posts");
 
@@ -237,7 +240,7 @@ exports.getProfileDetails = catchAsyncError(async (req, res, next) => {
 
 
 // Follow User
-exports.followUser = catchAsyncError(async (req, res, next) => {
+export const followUser = catchAsyncError(async (req, res, next) => {
 
     const userToFollow = await User.findById(req.params.id);
     const user = await User.findById(req.user._id);
@@ -282,7 +285,7 @@ exports.followUser = catchAsyncError(async (req, res, next) => {
 
 
 // Update Password
-exports.updatePassword = catchAsyncError(async (req, res, next) => {
+export const updatePassword = catchAsyncError(async (req, res, next) => {
 
     const { oldPassword, newPassword, confirmPassword } = req.body;
 
@@ -324,7 +327,7 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
 
 
 // Forgot Password
-exports.forgotPassword = catchAsyncError(async (req, res, next) => {
+export const forgotPassword = catchAsyncError(async (req, res, next) => {
 
     const { email } = req.body;
 
@@ -378,7 +381,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
 
 // Reset Password
-exports.resetPassword = catchAsyncError(async (req, res, next) => {
+export const resetPassword = catchAsyncError(async (req, res, next) => {
 
     const { otp, newPassword, confirmPassword } = req.body;
 
@@ -440,7 +443,7 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
 
 
 // Upload User Avatar
-exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
+export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     const avatar = req.body.avatar;
 
@@ -484,7 +487,7 @@ exports.uploadAvatar = catchAsyncError(async (req, res, next) => {
 
 
 // Update User Profile
-exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
+export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     const { fname, lname, phone, gender, dob, about } = req.body;
 
@@ -541,7 +544,7 @@ exports.updateUserProfile = catchAsyncError(async (req, res, next) => {
 
 
 // Send Verification Email
-exports.sendVerificationEmail = catchAsyncError(async (req, res, next) => {
+export const sendVerificationEmail = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
@@ -589,7 +592,7 @@ exports.sendVerificationEmail = catchAsyncError(async (req, res, next) => {
 
 
 // Verify Account
-exports.verifyAccount = catchAsyncError(async (req, res, next) => {
+export const verifyAccount = catchAsyncError(async (req, res, next) => {
 
     const { otp } = req.body;
 
@@ -655,7 +658,7 @@ exports.verifyAccount = catchAsyncError(async (req, res, next) => {
 
 
 // Check Username Availabilty
-exports.checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
+export const checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
 
     const { uname } = req.body;
 
@@ -686,7 +689,7 @@ exports.checkUsernameAvailability = catchAsyncError(async (req, res, next) => {
 
 
 // Update Username
-exports.updateUsername = catchAsyncError(async (req, res, next) => {
+export const updateUsername = catchAsyncError(async (req, res, next) => {
 
     const { uname } = req.body;
 
@@ -726,7 +729,7 @@ exports.updateUsername = catchAsyncError(async (req, res, next) => {
 
 
 // Delete User Profile
-exports.deleteProfile = catchAsyncError(async (req, res, next) => {
+export const deleteProfile = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
@@ -771,7 +774,7 @@ exports.deleteProfile = catchAsyncError(async (req, res, next) => {
 
 
 // Get User Details
-exports.getUserProfileDetails = catchAsyncError(async (req, res, next) => {
+export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.params.id).populate("posts");
 
@@ -788,7 +791,7 @@ exports.getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
 
 // Search User
-exports.searchUser = catchAsyncError(async (req, res, next) => {
+export const searchUser = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.query.id);
 
@@ -812,13 +815,12 @@ exports.searchUser = catchAsyncError(async (req, res, next) => {
 
 
 // Get Random 10 Users
-exports.getRandomUsers = catchAsyncError(async (req, res, next) => {
+export const getRandomUsers = catchAsyncError(async (req, res, next) => {
 
     const users = await User.find().limit(5).skip(Math.random() * 5);
 
     res.status(200).json({
         success: true,
-        count: users.length,
         results: users
     });
 
@@ -826,7 +828,7 @@ exports.getRandomUsers = catchAsyncError(async (req, res, next) => {
 
 
 // Get All Users -- Admin
-exports.getAllUsers = catchAsyncError(async (req, res, next) => {
+export const getAllUsers = catchAsyncError(async (req, res, next) => {
 
     const users = await User.find();
 
@@ -840,7 +842,7 @@ exports.getAllUsers = catchAsyncError(async (req, res, next) => {
 
 
 // Update User Role -- Admin
-exports.updateUserRole = catchAsyncError(async (req, res, next) => {
+export const updateUserRole = catchAsyncError(async (req, res, next) => {
 
     const { role } = req.body;
 
@@ -867,7 +869,7 @@ exports.updateUserRole = catchAsyncError(async (req, res, next) => {
 
 
 // Update Account Status -- Admin
-exports.updateAccountStatus = catchAsyncError(async (req, res, next) => {
+export const updateAccountStatus = catchAsyncError(async (req, res, next) => {
 
     const { status } = req.body;
 
@@ -894,7 +896,7 @@ exports.updateAccountStatus = catchAsyncError(async (req, res, next) => {
 
 
 // Delete User -- Admin
-exports.deleteUser = catchAsyncError(async (req, res, next) => {
+export const deleteUser = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.params.id);
 

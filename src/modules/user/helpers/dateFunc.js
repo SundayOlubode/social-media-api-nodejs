@@ -28,4 +28,4 @@ const dates = {
 
 }
 
-module.exports = dates;
+export default dates;

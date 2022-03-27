@@ -1,11 +1,10 @@
-const ErrorHandler = require("../helpers/errorHandler");
-const catchAsyncError = require("../helpers/catchAsyncError");
-const jwt = require("jsonwebtoken");
-const User = require("../modules/user/models/user");
+import jwt from "jsonwebtoken";
+import ErrorHandler from "../helpers/errorHandler.js";
+import catchAsyncError from "../helpers/catchAsyncError.js";
+import User from "../modules/user/models/user.js";
 
 
-// Authenticated User
-exports.isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
+export const isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
 
     const bearerHeader = req.headers['authorization'];
 
@@ -13,7 +12,7 @@ exports.isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
 
-        token = bearerToken;
+        const token = bearerToken;
 
         if (!token) {
             return next(new ErrorHandler("Please login to account.", 400));
@@ -33,7 +32,7 @@ exports.isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
 
 
 // AUthorize Roles
-exports.authorizeRoles = (...roles) => {
+export function authorizeRoles(...roles) {
 
     return (req, res, next) => {
 

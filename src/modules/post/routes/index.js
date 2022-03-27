@@ -1,52 +1,44 @@
-const express = require("express");
-const {
-    createPost,
-    likeAndUnlikePost,
-    deletePost,
-    getFollowingPosts,
-    updatePost,
-    getPostDetails,
-    addComment,
-    deleteComment,
-    getAllPosts,
-    likeAndUnlikeComment,
-    getCommentDetails,
-    getAllComments
-} = require("../controllers");
-const { isAuthenticatedUser } = require("../../../middlewares/auth");
+import { Router } from "express";
+import {
+    createPost, likeAndUnlikePost, deletePost,
+    getFollowingPosts, updatePost, getPostDetails,
+    addComment, deleteComment, getAllPosts,
+    likeAndUnlikeComment, getCommentDetails, getAllComments
+} from "../controllers/index.js";
+import { isAuthenticatedUser } from "../../../middlewares/auth.js";
 
-const router = express.Router();
+const postRouter = Router();
 
 
 // Routes
-router.route("/post/create").post(isAuthenticatedUser, createPost);
+postRouter.route("/post/create").post(isAuthenticatedUser, createPost);
 
-router.route("/post/:id")
+postRouter.route("/post/:id")
     .get(isAuthenticatedUser, getPostDetails)
     .put(isAuthenticatedUser, updatePost)
     .delete(isAuthenticatedUser, deletePost);
 
-router.route("/post/like/:id")
+postRouter.route("/post/like/:id")
     .get(isAuthenticatedUser, likeAndUnlikePost)
 
-router.route("/posts").get(isAuthenticatedUser, getFollowingPosts);
+postRouter.route("/posts").get(isAuthenticatedUser, getFollowingPosts);
 
-router.route("/post/:id/comment/add")
+postRouter.route("/post/:id/comment/add")
     .post(isAuthenticatedUser, addComment);
 
-router.route("/post/comment/like/:id")
+postRouter.route("/post/comment/like/:id")
     .get(isAuthenticatedUser, likeAndUnlikeComment);
 
-router.route("/post/:id/comments")
+postRouter.route("/post/:id/comments")
     .get(isAuthenticatedUser, getAllComments);
 
-router.route("/post/comment/:id")
+postRouter.route("/post/comment/:id")
     .get(isAuthenticatedUser, getCommentDetails)
     .delete(isAuthenticatedUser, deleteComment);
 
 
 // Admin Routes
-router.route("/admin/posts").get(isAuthenticatedUser, getAllPosts);
+postRouter.route("/admin/posts").get(isAuthenticatedUser, getAllPosts);
 
 
-module.exports = router;
+export default postRouter;

@@ -1,13 +1,13 @@
-const cloudinary = require("cloudinary");
-const catchAsyncError = require("../../../helpers/catchAsyncError");
-const Post = require("../models/post");
-const User = require("../../user/models/user");
-const Comment = require("../models/comment");
-const ErrorHandler = require("../../../helpers/errorHandler");
+import cloudinary from 'cloudinary';
+import catchAsyncError from '../../../helpers/catchAsyncError.js';
+import ErrorHandler from '../../../helpers/errorHandler.js';
+import Post from '../models/post.js';
+import User from '../../user/models/user.js';
+import Comment from '../models/comment.js';
 
 
 // Create Post
-exports.createPost = catchAsyncError(async (req, res, next) => {
+export const createPost = catchAsyncError(async (req, res, next) => {
 
     const newPost = {
         caption: req.body.caption,
@@ -64,7 +64,7 @@ exports.createPost = catchAsyncError(async (req, res, next) => {
 
 
 // Like/Unlike Post
-exports.likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
+export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
     const post = await Post.findById(req.params.id);
 
@@ -99,7 +99,7 @@ exports.likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
 
 // Update Post
-exports.updatePost = catchAsyncError(async (req, res, next) => {
+export const updatePost = catchAsyncError(async (req, res, next) => {
 
     const { caption } = req.body;
 
@@ -173,7 +173,7 @@ exports.updatePost = catchAsyncError(async (req, res, next) => {
 
 
 // Delete Post
-exports.deletePost = catchAsyncError(async (req, res, next) => {
+export const deletePost = catchAsyncError(async (req, res, next) => {
 
     const post = await Post.findById(req.params.id);
 
@@ -210,7 +210,7 @@ exports.deletePost = catchAsyncError(async (req, res, next) => {
 
 
 // Get Following's Post
-exports.getFollowingPosts = catchAsyncError(async (req, res, next) => {
+export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
@@ -234,7 +234,7 @@ exports.getFollowingPosts = catchAsyncError(async (req, res, next) => {
 
 
 // Get All Posts
-exports.getAllPosts = catchAsyncError(async (req, res, next) => {
+export const getAllPosts = catchAsyncError(async (req, res, next) => {
 
     const posts = await Post.find()
         .sort({ createdAt: -1 })
@@ -253,7 +253,7 @@ exports.getAllPosts = catchAsyncError(async (req, res, next) => {
 
 
 // Get Post Details
-exports.getPostDetails = catchAsyncError(async (req, res, next) => {
+export const getPostDetails = catchAsyncError(async (req, res, next) => {
 
     const post = await Post.findById(req.params.id)
         .populate(
@@ -274,7 +274,7 @@ exports.getPostDetails = catchAsyncError(async (req, res, next) => {
 
 
 // Add Comment
-exports.addComment = catchAsyncError(async (req, res, next) => {
+export const addComment = catchAsyncError(async (req, res, next) => {
 
     const { comment } = req.body;
 
@@ -307,7 +307,7 @@ exports.addComment = catchAsyncError(async (req, res, next) => {
 
 
 // Like/Unlike Commnet
-exports.likeAndUnlikeComment = catchAsyncError(async (req, res, next) => {
+export const likeAndUnlikeComment = catchAsyncError(async (req, res, next) => {
 
     const comment = await Comment.findById(req.params.id);
 
@@ -342,7 +342,7 @@ exports.likeAndUnlikeComment = catchAsyncError(async (req, res, next) => {
 
 
 // Delete Comment
-exports.deleteComment = catchAsyncError(async (req, res, next) => {
+export const deleteComment = catchAsyncError(async (req, res, next) => {
 
     const comment = await Comment.findById(req.params.id);
 
@@ -383,7 +383,7 @@ exports.deleteComment = catchAsyncError(async (req, res, next) => {
 
 
 // Get All Comments
-exports.getAllComments = catchAsyncError(async (req, res, next) => {
+export const getAllComments = catchAsyncError(async (req, res, next) => {
 
     const comments = await Comment.find({
         post: req.params.id
@@ -399,7 +399,7 @@ exports.getAllComments = catchAsyncError(async (req, res, next) => {
 
 
 // Get Comment Details
-exports.getCommentDetails = catchAsyncError(async (req, res, next) => {
+export const getCommentDetails = catchAsyncError(async (req, res, next) => {
 
     const comment = await Comment.findById(req.params.id);
 

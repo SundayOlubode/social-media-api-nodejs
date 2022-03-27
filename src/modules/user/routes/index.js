@@ -1,87 +1,77 @@
-const express = require("express");
-const {
-    register,
-    login,
-    followUser,
-    logout,
-    updatePassword,
-    updateUserProfile,
-    deleteProfile,
-    getProfileDetails,
-    getUserProfileDetails,
-    getAllUsers,
-    forgotPassword,
-    resetPassword,
-    uploadAvatar,
-    updateUserRole,
-    deleteUser,
-    checkUsernameAvailability,
-    updateUsername,
-    searchUser,
-    updateAccountStatus,
-    sendVerificationEmail,
-    verifyAccount,
-    getRandomUsers
-} = require("../controllers");
-const { isAuthenticatedUser, authorizeRoles } = require("../../../middlewares/auth");
+import { Router } from "express";
+import {
+    register, login, followUser, logout,
+    updatePassword, updateUserProfile,
+    deleteProfile, getProfileDetails,
+    getUserProfileDetails, getAllUsers,
+    forgotPassword, resetPassword,
+    uploadAvatar, updateUserRole,
+    deleteUser, checkUsernameAvailability,
+    updateUsername, searchUser,
+    updateAccountStatus, sendVerificationEmail,
+    verifyAccount, getRandomUsers
+} from "../controllers/index.js";
+import {
+    isAuthenticatedUser, authorizeRoles
+} from "../../../middlewares/auth.js";
 
-const router = express.Router();
+const userRouter = Router();
 
 
 // Public Routes
-router.route("/register").post(register);
+userRouter.route("/register").post(register);
 
-router.route("/login").post(login);
+userRouter.route("/login").post(login);
 
-router.route("/logout").get(logout);
+userRouter.route("/logout").get(logout);
 
-router.route("/forgot/password").post(forgotPassword);
+userRouter.route("/forgot/password").post(forgotPassword);
 
-router.route("/reset/password").put(resetPassword);
+userRouter.route("/reset/password").put(resetPassword);
 
-router.route("/check/username").post(checkUsernameAvailability);
+userRouter.route("/check/username").post(checkUsernameAvailability);
 
 
 // Authenticated Routes
-router.route("/me").get(isAuthenticatedUser, getProfileDetails);
+userRouter.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
-router.route("/follow/:id").get(isAuthenticatedUser, followUser);
+userRouter.route("/follow/:id").get(isAuthenticatedUser, followUser);
 
-router.route("/update/password").put(isAuthenticatedUser, updatePassword);
+userRouter.route("/update/password").put(isAuthenticatedUser, updatePassword);
 
-router.route("/verify/me")
+userRouter.route("/verify/me")
     .get(isAuthenticatedUser, sendVerificationEmail)
     .put(isAuthenticatedUser, verifyAccount);
 
-router.route("/update/me").put(isAuthenticatedUser, updateUserProfile);
+userRouter.route("/update/me").put(isAuthenticatedUser, updateUserProfile);
 
-router.route("/update/username").put(isAuthenticatedUser, updateUsername);
+userRouter.route("/update/username").put(isAuthenticatedUser, updateUsername);
 
-router.route("/avatar/me").put(isAuthenticatedUser, uploadAvatar);
+userRouter.route("/avatar/me").put(isAuthenticatedUser, uploadAvatar);
 
-router.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
+userRouter.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
 
-router.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
+userRouter.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
-router.route("/user").get(isAuthenticatedUser, searchUser);
+userRouter.route("/user").get(isAuthenticatedUser, searchUser);
 
-router.route("/users")
+userRouter.route("/users")
     .get(isAuthenticatedUser, getRandomUsers);
 
 
 // Admin Routes
-router.route("/admin/users")
+userRouter.route("/admin/users")
     .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
 
-router.route("/admin/user/:id")
+userRouter.route("/admin/user/:id")
     .get(isAuthenticatedUser, authorizeRoles("admin"), getUserProfileDetails)
     .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser);
 
-router.route("/admin/user/update/role/:id")
+userRouter.route("/admin/user/update/role/:id")
     .put(isAuthenticatedUser, authorizeRoles("admin"), updateUserRole);
 
-router.route("/admin/user/update/status/:id")
+userRouter.route("/admin/user/update/status/:id")
     .put(isAuthenticatedUser, authorizeRoles("admin"), updateAccountStatus);
 
 
-module.exports = router;
+export default userRouter;

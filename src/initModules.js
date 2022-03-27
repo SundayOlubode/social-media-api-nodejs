@@ -1,5 +1,5 @@
-const postModule = require("./modules/post");
-const userModule = require("./modules/user");
+import userModule from './modules/user/index.js';
+import postModule from './modules/post/index.js';
 
 
 const initModules = (app) => {
@@ -7,4 +7,5 @@ const initModules = (app) => {
     postModule.init(app);
 }
 
-module.exports = initModules;
+
+export default initModules;

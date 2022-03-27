@@ -1,15 +1,16 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const bodyParser = require('body-parser');
-const errorMiddleware = require("./middlewares/errorMiddleware");
-const helmet = require("helmet");
-const compression = require("compression");
-const fileUpload = require("express-fileupload");
-const cors = require('cors');
-const cron = require('node-cron');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import helmet from 'helmet';
+import compression from 'compression';
+import fileUpload from 'express-fileupload';
+import cors from 'cors';
+import cron from 'node-cron';
+import errorMiddleware from './middlewares/errorMiddleware.js';
+import {deleteExpiredOTPs} from './modules/user/controllers/index.js';
 
 
-exports.runApp = () => {
+export const runApp = () => {
     const app = express();
 
     // Middlewares
@@ -27,8 +28,6 @@ exports.runApp = () => {
         exposedHeaders: ['x-auth-token']
     }));
 
-    const { deleteExpiredOTPs } = require('./modules/user/controllers');
-
     // Schedule a task
     cron.schedule('59 23 * * *', () => {
         console.log('[cron] task running every day at 11:59 PM')
@@ -45,7 +44,7 @@ exports.runApp = () => {
 }
 
 
-exports.closeApp = (app) => {
+export const closeApp = (app) => {
     // Middleware for Errors
     app.use(errorMiddleware);
 }

@@ -1,4 +1,4 @@
-const optGenerator = require('otp-generator');
+import optGenerator from 'otp-generator';
 
 
 const generateOTP = async (size = 6, expireTimeInMin = 15) => {
@@ -18,4 +18,4 @@ const generateOTP = async (size = 6, expireTimeInMin = 15) => {
     return { otp, expiresAt };
 }
 
-module.exports = generateOTP;
+export default generateOTP;

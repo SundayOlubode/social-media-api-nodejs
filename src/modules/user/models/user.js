@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const bcrypt = require('bcrypt');
-const jwt = require("jsonwebtoken");
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 
 const userSchema = new mongoose.Schema({
@@ -138,4 +138,6 @@ userSchema.methods.matchPassword = async function (userPassword) {
 
 
 userSchema.index({ uname: true });
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+export default User;

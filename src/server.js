@@ -1,7 +1,8 @@
-const cloudinary = require("cloudinary");
-const connectMongoDB = require('./helpers/connect-db');
-const { runApp, closeApp } = require("./app");
-const initModules = require("./initModules");
+import cloudinary from "cloudinary";
+import dotenv from "dotenv";
+import databse from './helpers/databse.js';
+import { runApp, closeApp } from "./app.js";
+import initModules from './initModules.js';
 
 const app = runApp();
 
@@ -9,7 +10,7 @@ const app = runApp();
 (async () => {
     // Config
     if (process.env.NODE_ENV !== "prod") {
-        require("dotenv").config({
+        dotenv.config({
             path: "src/config/config.env"
         });
     }
@@ -22,7 +23,7 @@ const app = runApp();
     });
 
     // Connecting to DB
-    await connectMongoDB(process.env.MONGO_URI, process.env.DB_NAME);
+    await databse.connect(process.env.MONGO_URI, process.env.DB_NAME);
 
     // Init Modules
     initModules(app);
@@ -30,7 +31,7 @@ const app = runApp();
     // Error Handler
     closeApp(app);
 
-    
+
     const port = process.env.PORT || 4000;
     const server = app.listen(port, (err) => {
 
