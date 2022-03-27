@@ -137,9 +137,7 @@ exports.register = catchAsyncError(async (req, res, next) => {
 
     res.status(201).json({
         success: true,
-        message: "User registered.",
-        token: token,
-        expiresAt: expiresAt
+        message: "User registered."
     });
 
 });
