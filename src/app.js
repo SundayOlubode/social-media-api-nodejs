@@ -7,7 +7,7 @@ import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import cron from 'node-cron';
 import errorMiddleware from './middlewares/errorMiddleware.js';
-import {deleteExpiredOTPs} from './modules/user/controllers/index.js';
+import { deleteExpiredOTPs } from './modules/user/controllers/index.js';
 
 
 export const runApp = () => {

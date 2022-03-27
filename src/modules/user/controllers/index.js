@@ -817,7 +817,7 @@ export const searchUser = catchAsyncError(async (req, res, next) => {
 // Get Random 10 Users
 export const getRandomUsers = catchAsyncError(async (req, res, next) => {
 
-    const users = await User.find().limit(5).skip(Math.random() * 5);
+    const users = await User.find().limit(5);
 
     res.status(200).json({
         success: true,
