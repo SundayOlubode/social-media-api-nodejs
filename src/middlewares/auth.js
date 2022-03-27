@@ -10,9 +10,7 @@ export const isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
 
     if (typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(' ');
-        const bearerToken = bearer[1];
-
-        const token = bearerToken;
+        const token = bearer[1];
 
         if (!token) {
             return next(new ErrorHandler("Please login to account.", 400));
