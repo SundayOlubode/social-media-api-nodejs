@@ -452,83 +452,73 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Please provide an avatar image", 400));
     }
 
-    const file = req.files.avatar;
-    const path = process.cwd() + "/files/" + file.name;
+    const fileSize = avatar.size / 1024;
+    const fileExt = avatar.name.split(".")[1];
 
-    file.mv(path, (err) => {
-        if (err) {
-            return res.status(500).send(err);
+    if (fileSize > 2048) {
+        return next(new ErrorHandler("Image size must be lower than 2mb", 413));
+    }
+
+    if (!["jpg", "jpeg", "png"].includes(fileExt)) {
+        return next(new ErrorHandler("Image or file format is unsupported", 422));
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    const fileTempPath = avatar.tempFilePath;
+
+    if (fileTempPath) {
+        if (user.avatar && user.avatar.public_id) {
+            const imageId = user.avatar.public_id;
+            await cloudinary.v2.uploader.destroy(imageId);
         }
-        return res.send({ status: "success", path: path });
-    });
 
-    // const fileSize = avatar.size / 1024;
-    // const fileExt = avatar.name.split(".")[1];
+        await cloudinary.v2.uploader
+            .upload(fileTempPath, {
+                folder: "social_media_api/avatars"
+            }).then(async (result) => {
 
-    // if (fileSize > 2048) {
-    //     return next(new ErrorHandler("Image size must be lower than 2mb", 413));
-    // }
+                user.avatar = {
+                    public_id: result.public_id,
+                    url: result.secure_url
+                }
 
-    // if (!["jpg", "jpeg", "png"].includes(fileExt)) {
-    //     return next(new ErrorHandler("Image or file format is unsupported", 422));
-    // }
+                await user.save();
 
-    // const user = await User.findById(req.user._id);
+                fs.unlink(fileTempPath, (err) => {
+                    if (err) console.log(err);
+                })
 
-    // if (!user) {
-    //     return next(new ErrorHandler("User not found.", 404));
-    // }
+                res.status(200).json({
+                    success: true,
+                    message: "User avatar updated."
+                });
 
-    // const fileTempPath = avatar.tempFilePath;
+            }).catch((err) => {
 
-    // if (fileTempPath) {
-    //     if (user.avatar && user.avatar.public_id) {
-    //         const imageId = user.avatar.public_id;
-    //         await cloudinary.v2.uploader.destroy(imageId);
-    //     }
+                fs.unlink(fileTempPath, (fileErr) => {
+                    if (fileErr) console.log(fileErr);
+                })
 
-    //     await cloudinary.v2.uploader
-    //         .upload(fileTempPath, {
-    //             folder: "social_media_api/avatars"
-    //         }).then(async (result) => {
+                console.log(err);
 
-    //             user.avatar = {
-    //                 public_id: result.public_id,
-    //                 url: result.secure_url
-    //             }
+                res.status(400).json({
+                    success: false,
+                    message: "An error occurred in uploading image to server."
+                });
 
-    //             await user.save();
-
-    //             fs.unlink(fileTempPath, (err) => {
-    //                 if (err) console.log(err);
-    //             })
-
-    //             res.status(200).json({
-    //                 success: true,
-    //                 message: "User avatar updated."
-    //             });
-
-    //         }).catch((err) => {
-
-    //             fs.unlink(fileTempPath, (fileErr) => {
-    //                 if (fileErr) console.log(fileErr);
-    //             })
-
-    //             console.log(err);
-
-    //             res.status(400).json({
-    //                 success: false,
-    //                 message: "An error occurred in uploading image to server."
-    //             });
-
-    //         });
-    // }
-    // else {
-    //     res.status(400).json({
-    //         success: false,
-    //         message: "An error occurred in uploading image to server."
-    //     });
-    // }
+            });
+    }
+    else {
+        res.status(400).json({
+            success: false,
+            message: "An error occurred in uploading image to server."
+        });
+    }
 });
 
 
