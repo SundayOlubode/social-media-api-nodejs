@@ -455,8 +455,6 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
     const fileSize = avatar.size / 1024;
     const fileExt = avatar.name.split(".")[1];
 
-    console.log(avatar);
-
     if (fileSize > 2048) {
         return next(new ErrorHandler("Image size must be lower than 2mb", 413));
     }
