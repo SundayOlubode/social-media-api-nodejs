@@ -489,9 +489,9 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
                 await user.save();
 
-                fs.unlink(fileTempPath, (err) => {
-                    if (err) console.log(err);
-                })
+                // fs.unlink(fileTempPath, (err) => {
+                //     if (err) console.log(err);
+                // })
 
                 res.status(200).json({
                     success: true,
@@ -500,9 +500,9 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
             }).catch((err) => {
 
-                fs.unlink(fileTempPath, (fileErr) => {
-                    if (fileErr) console.log(fileErr);
-                })
+                // fs.unlink(fileTempPath, (fileErr) => {
+                //     if (fileErr) console.log(fileErr);
+                // })
 
                 console.log(err);
 
