@@ -460,7 +460,7 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     await cloudinary.v2.uploader
         .upload(avatar, {
-            folder: "avatars"
+            folder: "social_media_api/avatars"
         }).then(async (result) => {
 
             user.avatar = {
@@ -477,7 +477,9 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
         }).catch((err) => {
 
-            res.status(200).json({
+            console.log(err);
+
+            res.status(400).json({
                 success: true,
                 message: err.message,
             });

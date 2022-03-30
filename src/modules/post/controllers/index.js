@@ -31,7 +31,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 
             const result = await cloudinary.v2.uploader.upload(
                 images[i],
-                { folder: "nixlab/posts" }
+                { folder: "social_media_api/posts" }
             );
 
             imageLinks.push({
