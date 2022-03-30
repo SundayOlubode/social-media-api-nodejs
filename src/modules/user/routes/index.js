@@ -14,7 +14,6 @@ import {
 import {
     isAuthenticatedUser, authorizeRoles
 } from "../../../middlewares/auth.js";
-import multerUpload from "../../../middlewares/multer.js";
 
 const userRouter = Router();
 
@@ -49,7 +48,7 @@ userRouter.route("/update/me").put(isAuthenticatedUser, updateUserProfile);
 userRouter.route("/update/username").put(isAuthenticatedUser, updateUsername);
 
 userRouter.route("/avatar/me")
-    .post(isAuthenticatedUser, multerUpload.single('avatar'), uploadAvatar);
+    .post(isAuthenticatedUser, uploadAvatar);
 
 userRouter.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
 

@@ -16,7 +16,6 @@
     "body-parser": "^1.19.2",
     "cloudinary": "^1.29.0",
     "compression": "^1.7.4",
-    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
@@ -24,7 +23,6 @@
     "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.8",
-    "multer": "^1.4.4",
     "node-cron": "^3.0.0",
     "otp-generator": "^4.0.0",
     "validator": "^13.7.0"

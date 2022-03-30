@@ -11,6 +11,8 @@ import {
 } from '../../../utils/validators.js';
 import dates from '../helpers/dateFunc.js';
 import generateOTP from '../helpers/generateOTP.js';
+import fs from 'fs';
+
 
 // Check Username Availability
 export const checkUsernameAvailable = async (uname) => {
@@ -444,48 +446,71 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 // Upload User Avatar
 export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
-    console.log('file : ', req.file?.path);
-
-    const avatar = req.body.avatar;
+    const avatar = req.files?.avatar;
 
     if (!avatar) {
-        return next(new ErrorHandler("Please provide an avatar image.", 400));
+        return next(new ErrorHandler("Please provide an avatar image", 400));
     }
 
-    // const user = await User.findById(req.user._id);
+    const fileSize = avatar.size / 1024;
+    const fileExt = avatar.name.split(".")[1];
 
-    // if (user.avatar && user.avatar.public_id) {
-    //     const imageId = user.avatar.public_id;
-    //     await cloudinary.v2.uploader.destroy(imageId);
-    // }
+    if (fileSize > 2048) {
+        return next(new ErrorHandler("Image size must be lower than 2mb", 400));
+    }
 
-    // await cloudinary.v2.uploader
-    //     .upload(avatar, {
-    //         folder: "social_media_api/avatars"
-    //     }).then(async (result) => {
+    if (!["jpg", "jpeg", "png"].includes(fileExt)) {
+        return next(new ErrorHandler("Image or file format is unsupported", 400));
+    }
 
-    //         user.avatar = {
-    //             public_id: result.public_id,
-    //             url: result.secure_url
-    //         }
+    const user = await User.findById(req.user._id);
 
-    //         await user.save();
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
 
-    //         res.status(200).json({
-    //             success: true,
-    //             message: "User avatar updated."
-    //         });
+    if (user.avatar && user.avatar.public_id) {
+        const imageId = user.avatar.public_id;
+        await cloudinary.v2.uploader.destroy(imageId);
+    }
 
-    //     }).catch((err) => {
+    const fileTempPath = avatar.tempFilePath;
 
-    //         console.log(err);
+    await cloudinary.v2.uploader
+        .upload(fileTempPath, {
+            folder: "social_media_api/avatars"
+        }).then(async (result) => {
 
-    //         res.status(400).json({
-    //             success: false,
-    //             message: "An error occurred in uploading image to server."
-    //         });
+            user.avatar = {
+                public_id: result.public_id,
+                url: result.secure_url
+            }
 
-    //     });
+            await user.save();
+
+            fs.unlink(fileTempPath, (err) => {
+                if (err) console.log(err);
+            })
+
+            res.status(200).json({
+                success: true,
+                message: "User avatar updated."
+            });
+
+        }).catch((err) => {
+
+            fs.unlink(fileTempPath, (fileErr) => {
+                if (fileErr) console.log(fileErr);
+            })
+
+            console.log(err);
+
+            res.status(400).json({
+                success: false,
+                message: "An error occurred in uploading image to server."
+            });
+
+        });
 });
 
 
@@ -495,6 +520,10 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
     const { fname, lname, phone, gender, dob, about } = req.body;
 
     const user = await User.findById(req.user._id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
 
     if (fname) {
         if (String(fname).length < 3) {
