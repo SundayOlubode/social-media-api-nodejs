@@ -27,8 +27,7 @@ export const runApp = () => {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(fileUpload({
-        useTempFiles: true,
-        tempFileDir: path.join(process.cwd(), "./tmp"),
+        createParentPath: true
     }));
 
     // Schedule a task
