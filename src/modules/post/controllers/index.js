@@ -14,7 +14,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
         owner: req.user._id
     };
 
-    if (req.body.images) {
+    if (req.files.images) {
 
         let images = [];
 
