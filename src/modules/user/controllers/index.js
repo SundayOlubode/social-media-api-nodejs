@@ -12,7 +12,6 @@ import {
 import dates from '../helpers/dateFunc.js';
 import generateOTP from '../helpers/generateOTP.js';
 
-
 // Check Username Availability
 export const checkUsernameAvailable = async (uname) => {
     let user = await User.findOne({ uname });
@@ -445,46 +444,48 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 // Upload User Avatar
 export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
+    console.log('file : ', req.file?.path);
+
     const avatar = req.body.avatar;
 
     if (!avatar) {
         return next(new ErrorHandler("Please provide an avatar image.", 400));
     }
 
-    const user = await User.findById(req.user._id);
+    // const user = await User.findById(req.user._id);
 
-    if (user.avatar && user.avatar.public_id) {
-        const imageId = user.avatar.public_id;
-        await cloudinary.v2.uploader.destroy(imageId);
-    }
+    // if (user.avatar && user.avatar.public_id) {
+    //     const imageId = user.avatar.public_id;
+    //     await cloudinary.v2.uploader.destroy(imageId);
+    // }
 
-    await cloudinary.v2.uploader
-        .upload(avatar, {
-            folder: "social_media_api/avatars"
-        }).then(async (result) => {
+    // await cloudinary.v2.uploader
+    //     .upload(avatar, {
+    //         folder: "social_media_api/avatars"
+    //     }).then(async (result) => {
 
-            user.avatar = {
-                public_id: result.public_id,
-                url: result.secure_url
-            }
+    //         user.avatar = {
+    //             public_id: result.public_id,
+    //             url: result.secure_url
+    //         }
 
-            await user.save();
+    //         await user.save();
 
-            res.status(200).json({
-                success: true,
-                message: "User avatar updated."
-            });
+    //         res.status(200).json({
+    //             success: true,
+    //             message: "User avatar updated."
+    //         });
 
-        }).catch((err) => {
+    //     }).catch((err) => {
 
-            console.log(err);
+    //         console.log(err);
 
-            res.status(400).json({
-                success: false,
-                message: "An error occurred in uploading image to server."
-            });
+    //         res.status(400).json({
+    //             success: false,
+    //             message: "An error occurred in uploading image to server."
+    //         });
 
-        });
+    //     });
 });
 
 
