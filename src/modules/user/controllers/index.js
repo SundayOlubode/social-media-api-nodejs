@@ -480,8 +480,8 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
             console.log(err);
 
             res.status(400).json({
-                success: true,
-                message: err.message,
+                success: false,
+                message: "An error occurred in uploading image to server."
             });
 
         });
