@@ -17,6 +17,16 @@ export const createPost = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Please provide atleast one post image", 400));
     }
 
+    for (let i = 0; i < images.length; i++) {
+        let tempImage = images[i];
+
+        const fileSize = tempImage.size / 1024;
+
+        if (fileSize > 2048) {
+            return next(new ErrorHandler("Each image size must be lower than 2mb", 413));
+        }
+    }
+
     let imageLinks = [];
 
     for (let i = 0; i < images.length; i++) {
@@ -46,7 +56,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 
                 res.status(400).json({
                     success: false,
-                    message: "An error occurred in uploading image to server."
+                    message: "An error occurred in uploading image to server"
                 });
 
             });
@@ -70,7 +80,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
     res.status(201).json({
         success: true,
         message: "Post created",
-        result: post
+        post
     });
 
 });
@@ -94,7 +104,7 @@ export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "Post unliked."
+            message: "Post unliked"
         });
     }
     else {
@@ -104,7 +114,7 @@ export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "Post liked."
+            message: "Post liked"
         });
     }
 
