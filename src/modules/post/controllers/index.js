@@ -1,4 +1,5 @@
 import cloudinary from 'cloudinary';
+import fs from 'fs';
 import catchAsyncError from '../../../helpers/catchAsyncError.js';
 import ErrorHandler from '../../../helpers/errorHandler.js';
 import Post from '../models/post.js';
@@ -9,42 +10,54 @@ import Comment from '../models/comment.js';
 // Create Post
 export const createPost = catchAsyncError(async (req, res, next) => {
 
+    const images = req.files;
+    //console.log(images);
+
+    if (!images || images?.length <= 0) {
+        return next(new ErrorHandler("Please provide atleast one post image", 400));
+    }
+
+    let imageLinks = [];
+
+    for (let i = 0; i < images.length; i++) {
+        let fileTempPath = images[i].path;
+
+        await cloudinary.v2.uploader
+            .upload(fileTempPath, {
+                folder: "social_media_api/posts"
+            }).then(async (result) => {
+
+                imageLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url
+                });
+
+                fs.unlink(fileTempPath, (err) => {
+                    if (err) console.log(err);
+                })
+
+            }).catch((err) => {
+
+                fs.unlink(fileTempPath, (fileErr) => {
+                    if (fileErr) console.log(fileErr);
+                })
+
+                console.log(err);
+
+                res.status(400).json({
+                    success: false,
+                    message: "An error occurred in uploading image to server."
+                });
+
+            });
+    }
+
     const newPost = {
         caption: req.body.caption,
         owner: req.user._id
     };
 
-    if (req.files.images) {
-
-        let images = [];
-
-        if (typeof req.body.images === "string") {
-            images.push(req.body.images);
-        }
-        else {
-            images = req.body.images;
-        }
-
-        const imageLinks = [];
-
-        for (let i = 0; i < images.length; i++) {
-
-            const result = await cloudinary.v2.uploader.upload(
-                images[i],
-                { folder: "social_media_api/posts" }
-            );
-
-            imageLinks.push({
-                public_id: result.public_id,
-                url: result.secure_url
-            });
-
-        }
-
-        req.body.images = imageLinks;
-
-        newPost.images = req.body.images;
-    }
+    newPost.images = imageLinks;
 
     const post = await Post.create(newPost);
 
@@ -56,7 +69,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 
     res.status(201).json({
         success: true,
-        message: "Post created.",
+        message: "Post created",
         result: post
     });
 

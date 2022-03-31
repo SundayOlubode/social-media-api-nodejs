@@ -6,12 +6,14 @@ import {
     likeAndUnlikeComment, getCommentDetails, getAllComments
 } from "../controllers/index.js";
 import { isAuthenticatedUser } from "../../../middlewares/auth.js";
+import multer from '../../../middlewares/multer.js';
 
 const postRouter = Router();
 
 
 // Routes
-postRouter.route("/post/create").post(isAuthenticatedUser, createPost);
+postRouter.route("/post/create")
+    .post(multer.array("images"), isAuthenticatedUser, createPost);
 
 postRouter.route("/post/:id")
     .get(isAuthenticatedUser, getPostDetails)

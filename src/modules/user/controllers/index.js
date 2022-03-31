@@ -512,7 +512,7 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
     else {
         res.status(400).json({
             success: false,
-            message: "An error occurred in uploading image to server."
+            message: "Image path is invalid."
         });
     }
 });

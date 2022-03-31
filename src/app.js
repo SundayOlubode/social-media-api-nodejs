@@ -2,10 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import compression from 'compression';
-import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import cron from 'node-cron';
-import path from 'path';
 import errorMiddleware from './middlewares/errorMiddleware.js';
 import { deleteExpiredOTPs } from './modules/user/controllers/index.js';
 
@@ -26,10 +24,7 @@ export const runApp = () => {
     app.use(express.urlencoded({ extended: true }));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
-    // app.use(fileUpload({
-    //     useTempFiles: true,
-    //     tempFileDir: path.join(path.dirname('./'), "tmp"),
-    // }));
+
 
     // Schedule a task
     cron.schedule('59 23 * * *', () => {
