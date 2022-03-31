@@ -26,10 +26,10 @@ export const runApp = () => {
     app.use(express.urlencoded({ extended: true }));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
-    app.use(fileUpload({
-        useTempFiles: true,
-        tempFileDir: path.join(path.dirname('./'), "tmp"),
-    }));
+    // app.use(fileUpload({
+    //     useTempFiles: true,
+    //     tempFileDir: path.join(path.dirname('./'), "tmp"),
+    // }));
 
     // Schedule a task
     cron.schedule('59 23 * * *', () => {

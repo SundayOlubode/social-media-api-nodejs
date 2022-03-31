@@ -446,21 +446,17 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 // Upload User Avatar
 export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
-    const avatar = req.files?.avatar;
+    const avatar = req.file;
+    // console.log(avatar);
 
     if (!avatar) {
         return next(new ErrorHandler("Please provide an avatar image", 400));
     }
 
     const fileSize = avatar.size / 1024;
-    const fileExt = avatar.name.split(".")[1];
 
     if (fileSize > 2048) {
         return next(new ErrorHandler("Image size must be lower than 2mb", 413));
-    }
-
-    if (!["jpg", "jpeg", "png"].includes(fileExt)) {
-        return next(new ErrorHandler("Image or file format is unsupported", 422));
     }
 
     const user = await User.findById(req.user._id);
@@ -469,7 +465,7 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("User not found.", 404));
     }
 
-    const fileTempPath = avatar.tempFilePath;
+    const fileTempPath = avatar.path;
 
     if (fileTempPath) {
         if (user.avatar && user.avatar.public_id) {
