@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 const databse = {
-    connect: async (mongoUri, dbName) => {
+    connect: async () => {
         try {
-            await mongoose.connect(mongoUri, {
-                dbName: dbName,
+            await mongoose.connect(process.env.MONGO_URI, {
+                dbName: process.env.DB_NAME,
                 autoIndex: true,
                 socketTimeoutMS: 45000,
                 serverSelectionTimeoutMS: 60000,

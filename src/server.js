@@ -23,7 +23,7 @@ const app = runApp();
     });
 
     // Connecting to DB
-    await databse.connect(process.env.MONGO_URI, process.env.DB_NAME);
+    await databse.connect();
 
     // Init Modules
     initModules(app);
