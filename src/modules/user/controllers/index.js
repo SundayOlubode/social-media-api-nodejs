@@ -715,7 +715,7 @@ export const checkUsernameAvailability = catchAsyncError(async (req, res, next) 
         });
     }
     else {
-        res.status(200).json({
+        res.status(400).json({
             success: false,
             message: "Username not available"
         });
