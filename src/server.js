@@ -42,7 +42,6 @@ const app = runApp();
         console.log(`[server] running on port: ${port}`)
     });
 
-
     // Handling Uncaught Exception
     process.on("uncaughtException", err => {
         console.log(`Error: ${err.message}`);
