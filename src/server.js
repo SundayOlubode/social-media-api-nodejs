@@ -9,7 +9,7 @@ const app = runApp();
 // Starting Server
 (async () => {
     // Config
-    if (process.env.NODE_ENV !== "prod") {
+    if (process.env.NODE_ENV !== "production") {
         dotenv.config({
             path: "src/config/config.env"
         });
