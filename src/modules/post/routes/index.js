@@ -5,7 +5,7 @@ import {
     addComment, deleteComment, getAllPosts,
     likeAndUnlikeComment, getCommentDetails, getAllComments
 } from "../controllers/index.js";
-import { isAuthenticatedUser } from "../../../middlewares/auth.js";
+import { isAuthenticatedUser, authorizeRoles } from "../../../middlewares/auth.js";
 import multer from '../../../middlewares/multer.js';
 
 const postRouter = Router();
@@ -40,7 +40,8 @@ postRouter.route("/post/comment/:id")
 
 
 // Admin Routes
-postRouter.route("/admin/posts").get(isAuthenticatedUser, getAllPosts);
+postRouter.route("/admin/posts")
+    .get(isAuthenticatedUser, authorizeRoles("admin"), getAllPosts);
 
 
 export default postRouter;

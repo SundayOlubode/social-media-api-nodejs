@@ -14,7 +14,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
     //console.log(images);
 
     if (!images || images?.length <= 0) {
-        return next(new ErrorHandler("Please provide atleast one post image", 400));
+        return next(new ErrorHandler("Please provide atleast one post image.", 400));
     }
 
     for (let i = 0; i < images.length; i++) {
@@ -23,7 +23,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
         const fileSize = tempImage.size / 1024;
 
         if (fileSize > 2048) {
-            return next(new ErrorHandler("Each image size must be lower than 2mb", 413));
+            return next(new ErrorHandler("Each image size must be lower than 2mb.", 413));
         }
     }
 
@@ -56,7 +56,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 
                 res.status(400).json({
                     success: false,
-                    message: "An error occurred in uploading image to server"
+                    message: "An error occurred in uploading image to server."
                 });
 
             });
@@ -79,7 +79,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 
     res.status(201).json({
         success: true,
-        message: "Post created",
+        message: "Post created.",
         post
     });
 
@@ -104,7 +104,7 @@ export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "Post unliked"
+            message: "Post unliked."
         });
     }
     else {
@@ -114,7 +114,7 @@ export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "Post liked"
+            message: "Post liked."
         });
     }
 
@@ -237,9 +237,13 @@ export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
     const posts = await Post.find({
         owner: {
-            $in: user.following
+            $in: [...user.following, user._id]
         }
     }).sort({ createdAt: -1 })
         .populate(
@@ -251,12 +255,12 @@ export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
         success: true,
         count: posts.length,
         posts
-    })
+    });
 
 });
 
 
-// Get All Posts
+// Get All Posts -- Admin
 export const getAllPosts = catchAsyncError(async (req, res, next) => {
 
     const posts = await Post.find()
@@ -270,7 +274,7 @@ export const getAllPosts = catchAsyncError(async (req, res, next) => {
         success: true,
         count: posts.length,
         posts
-    })
+    });
 
 });
 
@@ -291,7 +295,7 @@ export const getPostDetails = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
         success: true,
         post
-    })
+    });
 
 });
 

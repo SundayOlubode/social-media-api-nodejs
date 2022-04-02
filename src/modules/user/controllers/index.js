@@ -372,7 +372,7 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "OTP sent."
+            message: "OTP has been sent to your email address."
         });
     } catch (err) {
         return next(new ErrorHandler(err.message, 500));
@@ -450,19 +450,19 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
     // console.log(avatar);
 
     if (!avatar) {
-        return next(new ErrorHandler("Please provide an avatar image", 400));
+        return next(new ErrorHandler("Please provide an avatar image.", 400));
     }
 
     const fileSize = avatar.size / 1024;
 
     if (fileSize > 2048) {
-        return next(new ErrorHandler("Image size must be lower than 2mb", 413));
+        return next(new ErrorHandler("Image size must be lower than 2mb.", 413));
     }
 
     const user = await User.findById(req.user._id);
 
     if (!user) {
-        return next(new ErrorHandler("User not found", 404));
+        return next(new ErrorHandler("User not found.", 404));
     }
 
     const fileTempPath = avatar.path;
@@ -491,7 +491,7 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
                 res.status(200).json({
                     success: true,
-                    message: "User avatar updated"
+                    message: "Profile picture updated."
                 });
 
             }).catch((err) => {
@@ -504,7 +504,7 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
                 res.status(400).json({
                     success: false,
-                    message: "An error occurred in uploading image to server"
+                    message: "An error occurred in uploading image to server."
                 });
 
             });
@@ -512,7 +512,7 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
     else {
         res.status(400).json({
             success: false,
-            message: "Image path is invalid"
+            message: "Image path is invalid."
         });
     }
 });
@@ -526,12 +526,12 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (!user) {
-        return next(new ErrorHandler("User not found", 404));
+        return next(new ErrorHandler("User not found.", 404));
     }
 
     if (fname) {
         if (String(fname).length < 3) {
-            return next(new ErrorHandler("First name must be at least 3 characters", 400));
+            return next(new ErrorHandler("First name must be at least 3 characters.", 400));
         }
         else {
             user.fname = fname;
@@ -540,7 +540,7 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     if (lname) {
         if (String(lname).length < 1) {
-            return next(new ErrorHandler("Last name can't be empty", 400));
+            return next(new ErrorHandler("Last name can't be empty.", 400));
         }
         else {
             user.lname = lname;
@@ -550,7 +550,7 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
     if (phone) {
         const phoneRegExp = /^\d{10}$/;
         if (!String(phone.phoneNo).match(phoneRegExp)) {
-            return next(new ErrorHandler("Enter a valid phone number", 400));
+            return next(new ErrorHandler("Enter a valid phone number.", 400));
         }
 
         user.phone = phone;
@@ -573,7 +573,7 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: "User profile updated"
+        message: "Profile details updated."
     });
 
 });
@@ -585,7 +585,7 @@ export const sendVerificationEmail = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (!user) {
-        return next(new ErrorHandler("User does not exist", 404));
+        return next(new ErrorHandler("User does not exist.", 404));
     }
 
     // Generating OTP
@@ -618,7 +618,7 @@ export const sendVerificationEmail = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "OTP sent"
+            message: "OTP has been sent to your email address."
         });
     } catch (err) {
         return next(new ErrorHandler(err.message, 500));
@@ -633,17 +633,17 @@ export const verifyAccount = catchAsyncError(async (req, res, next) => {
     const { otp } = req.body;
 
     if (!otp) {
-        return next(new ErrorHandler("Please enter OTP", 400));
+        return next(new ErrorHandler("Please enter OTP.", 400));
     }
 
     const otpObj = await OTP.findOne({ otp });
 
     if (!otpObj) {
-        return next(new ErrorHandler("OTP is invalid", 401))
+        return next(new ErrorHandler("OTP is invalid.", 401))
     }
 
     if (otpObj.isVerified === true) {
-        return next(new ErrorHandler("OTP is already used", 401))
+        return next(new ErrorHandler("OTP is already used.", 401))
     }
 
     if (dates.compare(otpObj.expiresAt, new Date()) === 1) {
@@ -651,7 +651,7 @@ export const verifyAccount = catchAsyncError(async (req, res, next) => {
         const user = await User.findById(req.user._id);
 
         if (!user) {
-            return next(new ErrorHandler("User does not exist", 404));
+            return next(new ErrorHandler("User does not exist.", 404));
         }
 
         if (otpObj._id.toString() === user.otp.toString()) {
@@ -666,7 +666,7 @@ export const verifyAccount = catchAsyncError(async (req, res, next) => {
 
                 res.status(200).json({
                     success: true,
-                    message: "User account verified"
+                    message: "User account verified."
                 });
             }
 
@@ -678,16 +678,16 @@ export const verifyAccount = catchAsyncError(async (req, res, next) => {
 
             res.status(200).json({
                 success: true,
-                message: "Already verified"
+                message: "Already verified."
             });
 
         }
         else {
-            return next(new ErrorHandler("OTP is invalid or expired", 401));
+            return next(new ErrorHandler("OTP is invalid or expired.", 401));
         }
     }
     else {
-        return next(new ErrorHandler("OTP is expired", 401));
+        return next(new ErrorHandler("OTP is expired.", 401));
     }
 
 });
@@ -699,11 +699,11 @@ export const checkUsernameAvailability = catchAsyncError(async (req, res, next) 
     const { uname } = req.body;
 
     if (!uname) {
-        return next(new ErrorHandler("Please enter an username", 400));
+        return next(new ErrorHandler("Please enter an username.", 400));
     }
 
     if (uname && !validateUsername(uname)) {
-        return next(new ErrorHandler("Please enter a valid username", 400));
+        return next(new ErrorHandler("Please enter a valid username.", 400));
     }
 
     const isUsernameAvailable = await checkUsernameAvailable(uname);
@@ -711,13 +711,13 @@ export const checkUsernameAvailability = catchAsyncError(async (req, res, next) 
     if (isUsernameAvailable) {
         res.status(200).json({
             success: true,
-            message: "Username available"
+            message: "Username available."
         });
     }
     else {
         res.status(400).json({
             success: false,
-            message: "Username not available"
+            message: "Username not available."
         });
     }
 
@@ -730,11 +730,11 @@ export const updateUsername = catchAsyncError(async (req, res, next) => {
     const { uname } = req.body;
 
     if (!uname) {
-        return next(new ErrorHandler("Please enter an username", 400));
+        return next(new ErrorHandler("Please enter an username.", 400));
     }
 
     if (uname && !validateUsername(uname)) {
-        return next(new ErrorHandler("Please enter a valid username", 400));
+        return next(new ErrorHandler("Please enter a valid username.", 400));
     }
 
     const isUsernameAvailable = await checkUsernameAvailable(uname);
@@ -751,13 +751,13 @@ export const updateUsername = catchAsyncError(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "Username updated"
+            message: "Username updated."
         });
     }
     else {
         res.status(400).json({
             success: false,
-            message: "Username couldn't updated"
+            message: "Username couldn't updated."
         });
     }
 
