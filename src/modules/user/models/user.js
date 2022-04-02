@@ -61,14 +61,14 @@ const userSchema = new mongoose.Schema({
 
     followers: [
         {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: "User"
         }
     ],
 
     following: [
         {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: "User"
         }
     ],

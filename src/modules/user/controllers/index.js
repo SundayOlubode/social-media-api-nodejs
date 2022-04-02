@@ -826,6 +826,50 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Get Following User List
+export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.user._id)
+        .populate(
+            "following",
+            ["_id", "fname", "lname", "email", "uname", "avatar"],
+        );
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        count: user.following.length,
+        results: user.following
+    });
+
+})
+
+
+// Get Followers User List
+export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
+
+    const user = await User.findById(req.user._id)
+        .populate(
+            "followers",
+            ["_id", "fname", "lname", "email", "uname", "avatar"],
+        );
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        count: user.followers.length,
+        results: user.followers
+    });
+
+})
+
+
 // Search User
 export const searchUser = catchAsyncError(async (req, res, next) => {
 

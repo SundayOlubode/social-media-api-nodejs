@@ -9,7 +9,7 @@ import {
     deleteUser, checkUsernameAvailability,
     updateUsername, searchUser,
     updateAccountStatus, sendVerificationEmail,
-    verifyAccount, getRandomUsers
+    verifyAccount, getRandomUsers, getFollowingUserList, getFollowersUserList
 } from "../controllers/index.js";
 import {
     isAuthenticatedUser, authorizeRoles
@@ -56,6 +56,12 @@ userRouter.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
 userRouter.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
 userRouter.route("/user").get(isAuthenticatedUser, searchUser);
+
+userRouter.route("/following")
+    .get(isAuthenticatedUser, getFollowingUserList);
+
+userRouter.route("/followers")
+    .get(isAuthenticatedUser, getFollowersUserList);
 
 userRouter.route("/users")
     .get(isAuthenticatedUser, getRandomUsers);
