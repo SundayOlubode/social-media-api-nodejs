@@ -230,7 +230,13 @@ export const logout = catchAsyncError(async (req, res, next) => {
 // Get Profile Details
 export const getProfileDetails = catchAsyncError(async (req, res, next) => {
 
-    const user = await User.findById(req.user._id).populate("posts");
+    const user = await User.findById(req.user._id).populate({
+        path: "posts",
+        model: "Post",
+        options: {
+            sort: { createdAt: -1 }
+        }
+    });
 
     res.status(200).json({
         success: true,
@@ -814,13 +820,17 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
     const user = await User.findById(req.params.id).populate({
         path: 'posts',
+        model: "Post",
         populate: [
             {
                 path: 'owner',
-                model: 'User',
+                model: "User",
                 select: ["_id", "fname", "lname", "email", "uname", "avatar"]
             }
-        ]
+        ],
+        options: {
+            sort: { createdAt: -1 }
+        }
     });
 
     if (!user) {
