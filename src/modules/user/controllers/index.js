@@ -812,7 +812,16 @@ export const deleteProfile = catchAsyncError(async (req, res, next) => {
 // Get User Details
 export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
-    const user = await User.findById(req.params.id).populate("posts");
+    const user = await User.findById(req.params.id).populate({
+        path: 'posts',
+        populate: [
+            {
+                path: 'owner',
+                model: 'User',
+                select: ["_id", "fname", "lname", "email", "uname", "avatar"]
+            }
+        ]
+    });
 
     if (!user) {
         return next(new ErrorHandler("User not found.", 404));
