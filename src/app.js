@@ -33,9 +33,12 @@ export const runApp = () => {
     });
 
 
-    // Home Page Route
+    // Index Route
     app.route('/').get(function (req, res) {
-        res.sendFile(process.cwd() + '/index.html')
+        res.status(200).json({
+            success: true,
+            message: "Server is up and running..."
+        });
     });
 
 
@@ -46,4 +49,10 @@ export const runApp = () => {
 export const closeApp = (app) => {
     // Middleware for Errors
     app.use(errorMiddleware);
+    app.use("*", (req, res, next) => {
+        res.status(404).json({
+            success: false,
+            message: 'API endpoint not found.'
+        });
+    })
 }

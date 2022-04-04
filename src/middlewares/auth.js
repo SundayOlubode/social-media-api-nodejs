@@ -6,25 +6,24 @@ import User from "../modules/user/models/user.js";
 
 export const isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
 
-    const bearerHeader = req.headers['authorization'];
+    const bearerHeader = req.headers.authorization;
 
-    if (typeof bearerHeader !== 'undefined') {
-        const bearer = bearerHeader.split(' ');
-        const token = bearer[1];
-
-        if (!token) {
-            return next(new ErrorHandler("Please login to account.", 400));
-        }
-
-        const userData = jwt.verify(token, process.env.JWT_SECRET);
-
-        req.user = await User.findById(userData.id);
-
-        next();
+    if (!bearerHeader) {
+        return next(new ErrorHandler("Auth header is missing.", 404));
     }
-    else {
-        return next(new ErrorHandler("Auth token not found in headers.", 400));
+
+    const bearer = bearerHeader.split(' ');
+    const token = bearer[1];
+
+    if (!token) {
+        return next(new ErrorHandler("Auth token not found.", 404));
     }
+
+    const userData = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = await User.findById(userData.id);
+
+    next();
 
 })
 
