@@ -834,7 +834,7 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
                 model: "User",
                 select: [
                     "_id", "fname", "lname", "email", "uname", "avatar",
-                    "profession", "accountType", "isVerified"
+                    "profession", "accountType", "accountStatus", "isVerified"
                 ]
             }
         ],
@@ -882,7 +882,7 @@ export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
             "following",
             [
                 "_id", "fname", "lname", "email", "uname", "avatar",
-                "profession", "accountType", "isVerified"
+                "profession", "accountType", "accountStatus", "isVerified"
             ],
         );
 
@@ -907,7 +907,7 @@ export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
             "followers",
             [
                 "_id", "fname", "lname", "email", "uname", "avatar",
-                "profession", "accountType", "isVerified"
+                "profession", "accountType", "accountStatus", "isVerified"
             ],
         );
 
