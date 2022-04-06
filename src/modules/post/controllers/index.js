@@ -248,7 +248,10 @@ export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
     }).sort({ createdAt: -1 })
         .populate(
             "owner",
-            ["_id", "fname", "lname", "email", "uname", "avatar"]
+            [
+                "_id", "fname", "lname", "email", "uname", "avatar",
+                "profession", "accountType", "accountStatus", "isVerified"
+            ]
         );
 
     res.status(200).json({
@@ -267,7 +270,10 @@ export const getAllPosts = catchAsyncError(async (req, res, next) => {
         .sort({ createdAt: -1 })
         .populate(
             "owner",
-            ["_id", "fname", "lname", "email", "uname", "avatar"]
+            [
+                "_id", "fname", "lname", "email", "uname", "avatar",
+                "profession", "accountType", "accountStatus", "isVerified"
+            ]
         );
 
     res.status(200).json({
@@ -285,7 +291,10 @@ export const getPostDetails = catchAsyncError(async (req, res, next) => {
     const post = await Post.findById(req.params.id)
         .populate(
             "owner",
-            ["_id", "fname", "lname", "email", "uname", "avatar"]
+            [
+                "_id", "fname", "lname", "email", "uname", "avatar",
+                "profession", "accountType", "accountStatus", "isVerified"
+            ]
         );
 
     if (!post) {
