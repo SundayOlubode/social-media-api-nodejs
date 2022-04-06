@@ -65,6 +65,7 @@ const userSchema = new mongoose.Schema({
     profession: {
         type: String,
         maxlength: 100,
+        default: "user"
     },
 
     posts: [
