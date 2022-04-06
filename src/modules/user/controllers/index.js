@@ -527,7 +527,10 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 // Update User Profile
 export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
-    const { fname, lname, phone, gender, dob, about } = req.body;
+    const {
+        fname, lname, phone, gender,
+        profession, dob, about
+    } = req.body;
 
     const user = await User.findById(req.user._id);
 
@@ -572,6 +575,10 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     if (about) {
         user.about = about;
+    }
+
+    if (profession) {
+        user.profession = profession;
     }
 
     await user.save();
@@ -662,8 +669,8 @@ export const verifyAccount = catchAsyncError(async (req, res, next) => {
 
         if (otpObj._id.toString() === user.otp.toString()) {
 
-            if (user.isVerified === false) {
-                user.isVerified = true;
+            if (user.emailVerified === false) {
+                user.emailVerified = true;
                 user.otp = undefined;
                 otpObj.isVerified = true;
 
@@ -825,7 +832,10 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
             {
                 path: 'owner',
                 model: "User",
-                select: ["_id", "fname", "lname", "email", "uname", "avatar"]
+                select: [
+                    "_id", "fname", "lname", "email", "uname", "avatar",
+                    "profession", "accountType", "isVerified"
+                ]
             }
         ],
         options: {
@@ -839,7 +849,26 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        user
+        user: {
+            "_id": user._id,
+            "fname": user.fname,
+            "lname": user.lname,
+            "email": user.email,
+            "uname": user.uname,
+            "posts": user.posts,
+            "followers": user.followers,
+            "following": user.following,
+            "avatar": user.avatar,
+            "about": user.about,
+            "dob": user.dob,
+            "gender": user.gender,
+            "profession": user.profession,
+            "accountType": user.accountType,
+            "role": user.role,
+            "accountStatus": user.accountStatus,
+            "isVerified": user.isVerified,
+            "createdAt": user.createdAt,
+        }
     });
 
 });
@@ -851,7 +880,10 @@ export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id)
         .populate(
             "following",
-            ["_id", "fname", "lname", "email", "uname", "avatar"],
+            [
+                "_id", "fname", "lname", "email", "uname", "avatar",
+                "profession", "accountType", "isVerified"
+            ],
         );
 
     if (!user) {
@@ -873,7 +905,10 @@ export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id)
         .populate(
             "followers",
-            ["_id", "fname", "lname", "email", "uname", "avatar"],
+            [
+                "_id", "fname", "lname", "email", "uname", "avatar",
+                "profession", "accountType", "isVerified"
+            ],
         );
 
     if (!user) {
@@ -916,7 +951,13 @@ export const searchUser = catchAsyncError(async (req, res, next) => {
 // Get Random 10 Users
 export const getRandomUsers = catchAsyncError(async (req, res, next) => {
 
-    const users = await User.find().limit(10);
+    const users = await User.find({},
+        {
+            _id: 1, fname: 1, lname: 1, email: 1, uname: 1,
+            avatar: 1, profession: 1, accountType: 1,
+            accountStatus: 1, isVerified: 1
+        }
+    ).limit(10);
 
     res.status(200).json({
         success: true,

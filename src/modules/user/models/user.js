@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
         unique: [true, "Email already exists."],
     },
 
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+
     uname: {
         type: String,
         required: [true, "Please enter an username."],
@@ -31,7 +36,12 @@ const userSchema = new mongoose.Schema({
 
     phone: {
         countryCode: String,
-        phoneNo: Number
+        phoneNo: String
+    },
+
+    phoneVerified: {
+        type: Boolean,
+        default: false
     },
 
     password: {
@@ -51,6 +61,11 @@ const userSchema = new mongoose.Schema({
     dob: String,
 
     about: String,
+
+    profession: {
+        type: String,
+        maxlength: 100,
+    },
 
     posts: [
         {
@@ -73,13 +88,21 @@ const userSchema = new mongoose.Schema({
         }
     ],
 
+    accountType: {
+        type: String,
+        enum: ["public", "private"],
+        default: "public"
+    },
+
     role: {
         type: String,
+        enum: ['user', 'admin'],
         default: "user"
     },
 
     accountStatus: {
         type: String,
+        enum: ["active", "suspended", "deleted"],
         default: "active"
     },
 
