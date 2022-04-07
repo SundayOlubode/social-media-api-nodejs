@@ -58,10 +58,10 @@ userRouter.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
 userRouter.route("/search-user").get(isAuthenticatedUser, searchUser);
 
-userRouter.route("/following")
+userRouter.route("/profile-following")
     .get(isAuthenticatedUser, getFollowingUserList);
 
-userRouter.route("/followers")
+userRouter.route("/profile-followers")
     .get(isAuthenticatedUser, getFollowersUserList);
 
 userRouter.route("/users")
