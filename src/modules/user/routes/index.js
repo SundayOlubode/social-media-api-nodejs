@@ -27,11 +27,11 @@ userRouter.route("/login").post(login);
 
 userRouter.route("/logout").get(logout);
 
-userRouter.route("/forgot/password").post(forgotPassword);
+userRouter.route("/forgot-password").post(forgotPassword);
 
-userRouter.route("/reset/password").post(resetPassword);
+userRouter.route("/reset-password").post(resetPassword);
 
-userRouter.route("/check/username").post(checkUsernameAvailability);
+userRouter.route("/check-username").post(checkUsernameAvailability);
 
 
 // Authenticated Routes
@@ -39,24 +39,24 @@ userRouter.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
 userRouter.route("/follow/:id").get(isAuthenticatedUser, followUser);
 
-userRouter.route("/change/password").post(isAuthenticatedUser, changePassword);
+userRouter.route("/change-password").post(isAuthenticatedUser, changePassword);
 
-userRouter.route("/verify/me")
+userRouter.route("/verify-email")
     .get(isAuthenticatedUser, sendVerificationEmail)
     .post(isAuthenticatedUser, verifyAccount);
 
-userRouter.route("/update/me").post(isAuthenticatedUser, updateUserProfile);
+userRouter.route("/update-profile").post(isAuthenticatedUser, updateUserProfile);
 
-userRouter.route("/username/change").post(isAuthenticatedUser, changeUsername);
+userRouter.route("/change-username").post(isAuthenticatedUser, changeUsername);
 
-userRouter.route("/avatar/me")
+userRouter.route("/upload-avatar")
     .post(multer.single('avatar'), isAuthenticatedUser, uploadAvatar);
 
-userRouter.route("/delete/me").delete(isAuthenticatedUser, deleteProfile);
+userRouter.route("/delete-profile").delete(isAuthenticatedUser, deleteProfile);
 
 userRouter.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
-userRouter.route("/user").get(isAuthenticatedUser, searchUser);
+userRouter.route("/search-user").get(isAuthenticatedUser, searchUser);
 
 userRouter.route("/following")
     .get(isAuthenticatedUser, getFollowingUserList);
