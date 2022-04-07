@@ -7,9 +7,10 @@ import {
     forgotPassword, resetPassword,
     uploadAvatar, updateUserRole,
     deleteUser, checkUsernameAvailability,
-    updateUsername, searchUser,
+    changeUsername, searchUser,
     updateAccountStatus, sendVerificationEmail,
-    verifyAccount, getRandomUsers, getFollowingUserList, getFollowersUserList
+    verifyAccount, getRandomUsers, getFollowingUserList,
+    getFollowersUserList
 } from "../controllers/index.js";
 import {
     isAuthenticatedUser, authorizeRoles
@@ -46,7 +47,7 @@ userRouter.route("/verify/me")
 
 userRouter.route("/update/me").post(isAuthenticatedUser, updateUserProfile);
 
-userRouter.route("/update/username").post(isAuthenticatedUser, updateUsername);
+userRouter.route("/change/username").post(isAuthenticatedUser, changeUsername);
 
 userRouter.route("/avatar/me")
     .post(multer.single('avatar'), isAuthenticatedUser, uploadAvatar);

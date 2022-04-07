@@ -742,7 +742,7 @@ export const checkUsernameAvailability = catchAsyncError(async (req, res, next) 
 
 
 // Update Username
-export const updateUsername = catchAsyncError(async (req, res, next) => {
+export const changeUsername = catchAsyncError(async (req, res, next) => {
 
     const { uname } = req.body;
 
