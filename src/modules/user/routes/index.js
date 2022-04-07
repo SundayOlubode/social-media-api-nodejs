@@ -45,7 +45,7 @@ userRouter.route("/verify-email")
     .get(isAuthenticatedUser, sendVerificationEmail)
     .post(isAuthenticatedUser, verifyAccount);
 
-userRouter.route("/update-profile").post(isAuthenticatedUser, updateUserProfile);
+userRouter.route("/profile-update").post(isAuthenticatedUser, updateUserProfile);
 
 userRouter.route("/change-username").post(isAuthenticatedUser, changeUsername);
 
