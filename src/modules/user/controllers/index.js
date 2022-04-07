@@ -528,8 +528,8 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     const {
-        fname, lname, phone, gender,
-        profession, dob, about
+        fname, lname, phone, gender, dob,
+        profession, about, accountType
     } = req.body;
 
     const user = await User.findById(req.user._id);
@@ -579,6 +579,10 @@ export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
     if (profession) {
         user.profession = profession;
+    }
+
+    if (accountType) {
+        user.accountType = accountType;
     }
 
     await user.save();
