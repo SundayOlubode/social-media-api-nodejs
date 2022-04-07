@@ -47,7 +47,7 @@ userRouter.route("/verify/me")
 
 userRouter.route("/update/me").post(isAuthenticatedUser, updateUserProfile);
 
-userRouter.route("/change/username").post(isAuthenticatedUser, changeUsername);
+userRouter.route("/username/change").post(isAuthenticatedUser, changeUsername);
 
 userRouter.route("/avatar/me")
     .post(multer.single('avatar'), isAuthenticatedUser, uploadAvatar);
