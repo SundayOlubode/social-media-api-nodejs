@@ -292,7 +292,7 @@ export const followUser = catchAsyncError(async (req, res, next) => {
 
 
 // Update Password
-export const updatePassword = catchAsyncError(async (req, res, next) => {
+export const changePassword = catchAsyncError(async (req, res, next) => {
 
     const { oldPassword, newPassword, confirmPassword } = req.body;
 

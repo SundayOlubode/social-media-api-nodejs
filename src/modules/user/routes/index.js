@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     register, login, followUser, logout,
-    updatePassword, updateUserProfile,
+    changePassword, updateUserProfile,
     deleteProfile, getProfileDetails,
     getUserProfileDetails, getAllUsers,
     forgotPassword, resetPassword,
@@ -28,7 +28,7 @@ userRouter.route("/logout").get(logout);
 
 userRouter.route("/forgot/password").post(forgotPassword);
 
-userRouter.route("/reset/password").put(resetPassword);
+userRouter.route("/reset/password").post(resetPassword);
 
 userRouter.route("/check/username").post(checkUsernameAvailability);
 
@@ -38,15 +38,15 @@ userRouter.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
 userRouter.route("/follow/:id").get(isAuthenticatedUser, followUser);
 
-userRouter.route("/update/password").put(isAuthenticatedUser, updatePassword);
+userRouter.route("/change/password").post(isAuthenticatedUser, changePassword);
 
 userRouter.route("/verify/me")
     .get(isAuthenticatedUser, sendVerificationEmail)
-    .put(isAuthenticatedUser, verifyAccount);
+    .post(isAuthenticatedUser, verifyAccount);
 
 userRouter.route("/update/me").put(isAuthenticatedUser, updateUserProfile);
 
-userRouter.route("/update/username").put(isAuthenticatedUser, updateUsername);
+userRouter.route("/update/username").post(isAuthenticatedUser, updateUsername);
 
 userRouter.route("/avatar/me")
     .post(multer.single('avatar'), isAuthenticatedUser, uploadAvatar);
