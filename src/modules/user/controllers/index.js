@@ -453,7 +453,6 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 
     const avatar = req.file;
-    // console.log(avatar);
 
     if (!avatar) {
         return next(new ErrorHandler("Please provide an avatar image.", 400));
