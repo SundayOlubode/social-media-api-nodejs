@@ -951,7 +951,13 @@ export const searchUser = catchAsyncError(async (req, res, next) => {
 // Get Random 10 Users
 export const getRandomUsers = catchAsyncError(async (req, res, next) => {
 
-    const users = await User.find({},
+    const userId = req.user._id;
+
+    const users = await User.find({
+        _id: {
+            $nin: [userId]
+        }
+    },
         {
             _id: 1, fname: 1, lname: 1, email: 1, uname: 1,
             avatar: 1, profession: 1, accountType: 1,
