@@ -526,62 +526,57 @@ export const uploadAvatar = catchAsyncError(async (req, res, next) => {
 // Update User Profile
 export const updateUserProfile = catchAsyncError(async (req, res, next) => {
 
-    const {
-        fname, lname, phone, gender, dob,
-        profession, about, accountType
-    } = req.body;
-
     const user = await User.findById(req.user._id);
 
     if (!user) {
         return next(new ErrorHandler("User not found.", 404));
     }
 
-    if (fname) {
-        if (String(fname).length < 3) {
+    if (req.body.fname) {
+        if (String(req.body.fname).length < 3) {
             return next(new ErrorHandler("First name must be at least 3 characters.", 400));
         }
         else {
-            user.fname = fname;
+            user.fname = req.body.fname;
         }
     }
 
-    if (lname) {
-        if (String(lname).length < 1) {
+    if (req.body.lname) {
+        if (String(req.body.lname).length < 1) {
             return next(new ErrorHandler("Last name can't be empty.", 400));
         }
         else {
-            user.lname = lname;
+            user.lname = req.body.lname;
         }
     }
 
-    if (phone) {
-        const phoneRegExp = /^\d{10}$/;
-        if (!String(phone.phoneNo).match(phoneRegExp)) {
-            return next(new ErrorHandler("Enter a valid phone number.", 400));
-        }
+    // if (req.body.phone) {
+    //     const phoneRegExp = /^\d{10}$/;
+    //     if (!String(req.body.phone.phoneNo).match(phoneRegExp)) {
+    //         return next(new ErrorHandler("Enter a valid phone number.", 400));
+    //     }
 
-        user.phone = phone;
+    //     user.phone = req.body.phone;
+    // }
+
+    if (req.body.gender) {
+        user.gender = req.body.gender;
     }
 
-    if (gender) {
-        user.gender = gender;
+    if (req.body.dob) {
+        user.dob = req.body.dob;
     }
 
-    if (dob) {
-        user.dob = dob;
+    if (req.body.about) {
+        user.about = req.body.about;
     }
 
-    if (about) {
-        user.about = about;
+    if (req.body.profession) {
+        user.profession = req.body.profession;
     }
 
-    if (profession) {
-        user.profession = profession;
-    }
-
-    if (accountType) {
-        user.accountType = accountType;
+    if (req.body.accountType) {
+        user.accountType = req.body.accountType;
     }
 
     await user.save();
