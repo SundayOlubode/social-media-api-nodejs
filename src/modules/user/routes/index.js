@@ -37,7 +37,7 @@ userRouter.route("/check-username").post(checkUsernameAvailability);
 // Authenticated Routes
 userRouter.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
-userRouter.route("/follow/:id").get(isAuthenticatedUser, followUser);
+userRouter.route("/follow-user/:id").get(isAuthenticatedUser, followUser);
 
 userRouter.route("/change-password").post(isAuthenticatedUser, changePassword);
 
