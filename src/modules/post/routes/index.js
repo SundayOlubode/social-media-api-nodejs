@@ -12,7 +12,7 @@ const postRouter = Router();
 
 
 // Routes
-postRouter.route("/post/create")
+postRouter.route("/create-post")
     .post(multer.array("images"), isAuthenticatedUser, createPost);
 
 postRouter.route("/post/:id")
@@ -20,10 +20,10 @@ postRouter.route("/post/:id")
     .put(isAuthenticatedUser, updatePost)
     .delete(isAuthenticatedUser, deletePost);
 
-postRouter.route("/post/like/:id")
+postRouter.route("/like-post/:id")
     .get(isAuthenticatedUser, likeAndUnlikePost)
 
-postRouter.route("/posts").get(isAuthenticatedUser, getFollowingPosts);
+postRouter.route("/get-posts").get(isAuthenticatedUser, getFollowingPosts);
 
 postRouter.route("/post/:id/comment/add")
     .post(isAuthenticatedUser, addComment);

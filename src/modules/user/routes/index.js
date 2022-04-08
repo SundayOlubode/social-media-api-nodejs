@@ -55,7 +55,7 @@ userRouter.route("/upload-avatar")
 
 userRouter.route("/delete-profile").delete(isAuthenticatedUser, deleteProfile);
 
-userRouter.route("/user/:id").get(isAuthenticatedUser, getUserProfileDetails);
+userRouter.route("/user-profile/:id").get(isAuthenticatedUser, getUserProfileDetails);
 
 userRouter.route("/search-user").get(isAuthenticatedUser, searchUser);
 
@@ -65,7 +65,7 @@ userRouter.route("/profile-following")
 userRouter.route("/profile-followers")
     .get(isAuthenticatedUser, getFollowersUserList);
 
-userRouter.route("/users")
+userRouter.route("/get-random-users")
     .get(isAuthenticatedUser, getRandomUsers);
 
 
