@@ -249,7 +249,7 @@ export const getProfileDetails = catchAsyncError(async (req, res, next) => {
 // Follow User
 export const followUser = catchAsyncError(async (req, res, next) => {
 
-    const userToFollow = await User.findById(req.params.id);
+    const userToFollow = await User.findById(req.query.id);
     const user = await User.findById(req.user._id);
 
     if (!userToFollow) {
@@ -823,7 +823,7 @@ export const deleteProfile = catchAsyncError(async (req, res, next) => {
 // Get User Details
 export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
-    const user = await User.findById(req.params.id).populate({
+    const user = await User.findById(req.query.id).populate({
         path: 'posts',
         model: "Post",
         populate: [
@@ -875,7 +875,7 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 // Get Following User List
 export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
 
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.query.id)
         .populate(
             "following",
             [
@@ -900,7 +900,7 @@ export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
 // Get Followers User List
 export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
 
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.query.id)
         .populate(
             "followers",
             [

@@ -8,18 +8,18 @@ const commentSchema = new mongoose.Schema({
     },
 
     user: {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: "User"
     },
 
     post: {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: "Post"
     },
 
     likes: [
         {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: "User"
         }
     ],
@@ -31,7 +31,6 @@ const commentSchema = new mongoose.Schema({
 })
 
 
-commentSchema.index({ user: true })
 const Comment = mongoose.model("Comment", commentSchema);
 
 export default Comment;

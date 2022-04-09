@@ -3,7 +3,7 @@ import {
     createPost, likeAndUnlikePost, deletePost,
     getFollowingPosts, updatePost, getPostDetails,
     addComment, deleteComment, getAllPosts,
-    likeAndUnlikeComment, getCommentDetails, getAllComments
+    likeAndUnlikeComment, getAllComments
 } from "../controllers/index.js";
 import { isAuthenticatedUser, authorizeRoles } from "../../../middlewares/auth.js";
 import multer from '../../../middlewares/multer.js';
@@ -15,32 +15,31 @@ const postRouter = Router();
 postRouter.route("/create-post")
     .post(multer.array("images"), isAuthenticatedUser, createPost);
 
-postRouter.route("/post/:id")
+postRouter.route("/post")
     .get(isAuthenticatedUser, getPostDetails)
     .put(isAuthenticatedUser, updatePost)
     .delete(isAuthenticatedUser, deletePost);
 
-postRouter.route("/like-post/:id")
+postRouter.route("/like-post")
     .get(isAuthenticatedUser, likeAndUnlikePost)
 
 postRouter.route("/get-posts").get(isAuthenticatedUser, getFollowingPosts);
 
-postRouter.route("/post/:id/comment/add")
+postRouter.route("/add-comment")
     .post(isAuthenticatedUser, addComment);
 
-postRouter.route("/post/comment/like/:id")
-    .get(isAuthenticatedUser, likeAndUnlikeComment);
-
-postRouter.route("/post/:id/comments")
+postRouter.route("/get-comments")
     .get(isAuthenticatedUser, getAllComments);
 
-postRouter.route("/post/comment/:id")
-    .get(isAuthenticatedUser, getCommentDetails)
+postRouter.route("/like-comment")
+    .get(isAuthenticatedUser, likeAndUnlikeComment);
+
+postRouter.route("/delete-comment")
     .delete(isAuthenticatedUser, deleteComment);
 
 
 // Admin Routes
-postRouter.route("/admin/posts")
+postRouter.route("/admin/get-posts")
     .get(isAuthenticatedUser, authorizeRoles("admin"), getAllPosts);
 
 

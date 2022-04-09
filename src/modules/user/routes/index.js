@@ -37,7 +37,7 @@ userRouter.route("/check-username").post(checkUsernameAvailability);
 // Authenticated Routes
 userRouter.route("/me").get(isAuthenticatedUser, getProfileDetails);
 
-userRouter.route("/follow-user/:id").get(isAuthenticatedUser, followUser);
+userRouter.route("/follow-user").get(isAuthenticatedUser, followUser);
 
 userRouter.route("/change-password").post(isAuthenticatedUser, changePassword);
 
@@ -55,14 +55,14 @@ userRouter.route("/upload-avatar")
 
 userRouter.route("/delete-profile").delete(isAuthenticatedUser, deleteProfile);
 
-userRouter.route("/user-profile/:id").get(isAuthenticatedUser, getUserProfileDetails);
+userRouter.route("/profile-details").get(isAuthenticatedUser, getUserProfileDetails);
 
 userRouter.route("/search-user").get(isAuthenticatedUser, searchUser);
 
-userRouter.route("/profile-following")
+userRouter.route("/get-following-list")
     .get(isAuthenticatedUser, getFollowingUserList);
 
-userRouter.route("/profile-followers")
+userRouter.route("/get-followers-list")
     .get(isAuthenticatedUser, getFollowersUserList);
 
 userRouter.route("/get-random-users")

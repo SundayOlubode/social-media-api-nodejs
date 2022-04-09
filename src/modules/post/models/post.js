@@ -12,20 +12,20 @@ const postSchema = new mongoose.Schema({
     ],
 
     owner: {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: "User"
     },
 
     likes: [
         {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: "User"
         }
     ],
 
     comments: [
         {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: "Comment"
         }
     ],

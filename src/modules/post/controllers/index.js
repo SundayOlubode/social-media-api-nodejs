@@ -89,7 +89,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 // Like/Unlike Post
 export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.query.id);
 
     if (!post) {
         return next(new ErrorHandler("Post does not exist.", 404));
@@ -198,7 +198,7 @@ export const updatePost = catchAsyncError(async (req, res, next) => {
 // Delete Post
 export const deletePost = catchAsyncError(async (req, res, next) => {
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.query.id);
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
@@ -288,7 +288,7 @@ export const getAllPosts = catchAsyncError(async (req, res, next) => {
 // Get Post Details
 export const getPostDetails = catchAsyncError(async (req, res, next) => {
 
-    const post = await Post.findById(req.params.id)
+    const post = await Post.findById(req.query.id)
         .populate(
             "owner",
             [
@@ -318,7 +318,7 @@ export const addComment = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Please enter a comment.", 400));
     }
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.query.postId);
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
@@ -342,10 +342,26 @@ export const addComment = catchAsyncError(async (req, res, next) => {
 });
 
 
+// Get All Comments
+export const getAllComments = catchAsyncError(async (req, res, next) => {
+
+    const comments = await Comment.find({
+        post: req.query.postId
+    });
+
+    res.status(200).json({
+        success: true,
+        count: comments.length,
+        comments
+    })
+
+});
+
+
 // Like/Unlike Commnet
 export const likeAndUnlikeComment = catchAsyncError(async (req, res, next) => {
 
-    const comment = await Comment.findById(req.params.id);
+    const comment = await Comment.findById(req.query.id);
 
     if (!comment) {
         return next(new ErrorHandler("Comment does not exist.", 404));
@@ -380,7 +396,7 @@ export const likeAndUnlikeComment = catchAsyncError(async (req, res, next) => {
 // Delete Comment
 export const deleteComment = catchAsyncError(async (req, res, next) => {
 
-    const comment = await Comment.findById(req.params.id);
+    const comment = await Comment.findById(req.query.id);
 
     if (!comment) {
         return next(new ErrorHandler("Comment does not exist.", 404));
@@ -414,38 +430,5 @@ export const deleteComment = catchAsyncError(async (req, res, next) => {
     else {
         return next(new ErrorHandler("Unauthorized.", 401));
     }
-
-});
-
-
-// Get All Comments
-export const getAllComments = catchAsyncError(async (req, res, next) => {
-
-    const comments = await Comment.find({
-        post: req.params.id
-    });
-
-    res.status(200).json({
-        success: true,
-        count: comments.length,
-        comments
-    })
-
-});
-
-
-// Get Comment Details
-export const getCommentDetails = catchAsyncError(async (req, res, next) => {
-
-    const comment = await Comment.findById(req.params.id);
-
-    if (!comment) {
-        return next(new ErrorHandler("Comment not found.", 404));
-    }
-
-    res.status(200).json({
-        success: true,
-        comment
-    })
 
 });
