@@ -295,7 +295,7 @@ export const getPostDetails = catchAsyncError(async (req, res, next) => {
                 "_id", "fname", "lname", "email", "uname", "avatar",
                 "profession", "accountType", "accountStatus", "isVerified"
             ]
-        );
+        ).populate("comments");
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
