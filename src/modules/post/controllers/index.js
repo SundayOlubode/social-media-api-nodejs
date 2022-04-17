@@ -288,14 +288,33 @@ export const getAllPosts = catchAsyncError(async (req, res, next) => {
 // Get Post Details
 export const getPostDetails = catchAsyncError(async (req, res, next) => {
 
-    const post = await Post.findById(req.query.id)
-        .populate(
-            "owner",
-            [
+    const post = await Post.findById(req.query.id).populate([
+        {
+            path: 'owner',
+            model: "User",
+            select: [
                 "_id", "fname", "lname", "email", "uname", "avatar",
                 "profession", "accountType", "accountStatus", "isVerified"
             ]
-        ).populate("comments");
+        },
+        {
+            path: 'comments',
+            model: "Comment",
+            populate: [
+                {
+                    path: 'user',
+                    model: "User",
+                    select: [
+                        "_id", "fname", "lname", "email", "uname", "avatar",
+                        "profession", "accountType", "accountStatus", "isVerified"
+                    ]
+                }
+            ],
+            options: {
+                sort: { createdAt: -1 }
+            }
+        }
+    ]);
 
     if (!post) {
         return next(new ErrorHandler("Post not found.", 404));
