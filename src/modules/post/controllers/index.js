@@ -366,13 +366,15 @@ export const getAllComments = catchAsyncError(async (req, res, next) => {
 
     const comments = await Comment.find({
         post: req.query.postId
-    }).populate(
-        "user",
-        [
-            "_id", "fname", "lname", "email", "uname", "avatar",
-            "profession", "accountType", "accountStatus", "isVerified"
-        ]
-    );
+    })
+        .sort({ createdAt: -1 })
+        .populate(
+            "user",
+            [
+                "_id", "fname", "lname", "email", "uname", "avatar",
+                "profession", "accountType", "accountStatus", "isVerified"
+            ]
+        );
 
     res.status(200).json({
         success: true,
