@@ -1,46 +1,44 @@
-import mongoose from 'mongoose';
-
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema({
-    caption: String,
+  caption: String,
 
-    images: [
-        {
-            public_id: String,
-            url: String
-        }
-    ],
-
-    owner: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User"
+  images: [
+    {
+      public_id: String,
+      url: String,
     },
+  ],
 
-    likes: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: "User"
-        }
-    ],
+  owner: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 
-    comments: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: "Comment"
-        }
-    ],
-
-    postStatus: {
-        type: String,
-        default: "active"
+  likes: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
     },
+  ],
 
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-})
+  comments: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Comment",
+    },
+  ],
 
+  postStatus: {
+    type: String,
+    default: "active",
+  },
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 postSchema.index({ owner: true });
 const Post = mongoose.model("Post", postSchema);
