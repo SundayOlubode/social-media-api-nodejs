@@ -1,7 +1,7 @@
 {
   "name": "social-media-api",
   "version": "1.1.0",
-  "description": "Social Media API by NixLab Technologies.",
+  "description": "An open-source RESTful API developed using NodeJS, ExpressJS and MongoDB helps you to integrate User Authentication and Social Media Post Management in your application with ease.",
   "main": "./src/server.js",
   "type": "module",
   "scripts": {
@@ -32,6 +32,7 @@
   },
   "engines": {
     "node": ">=17.x",
-    "pnpm": ">=7.x"
+    "pnpm": ">=7.x",
+    "npm": ">=8.x"
   }
 }
