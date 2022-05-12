@@ -908,7 +908,7 @@ export const getRandomUsers = catchAsyncError(async (req, res, next) => {
       accountStatus: 1,
       isVerified: 1,
     }
-  ).limit(10);
+  ).limit(50);
 
   res.status(200).json({
     success: true,
