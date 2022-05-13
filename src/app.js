@@ -28,7 +28,7 @@ export const runApp = () => {
 
   // Schedule a task
   cron.schedule("59 23 * * *", () => {
-    console.log("[cron] task running every day at 11:59 PM");
+    console.log("[cron]: task running every day at 11:59 PM");
     deleteExpiredOTPs();
   });
 

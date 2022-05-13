@@ -9,9 +9,9 @@ const databse = {
         socketTimeoutMS: 45000,
         serverSelectionTimeoutMS: 60000,
       });
-      console.log(`[database] connected successfully to MongoDB`);
+      console.log(`[database]: connected successfully to MongoDB`);
     } catch (err) {
-      console.log(`[database] could not connect due to [${err.message}]`);
+      console.log(`[database]: could not connect due to [${err.message}]`);
     }
   },
 };

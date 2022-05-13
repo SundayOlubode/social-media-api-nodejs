@@ -31,6 +31,7 @@ const postSchema = new mongoose.Schema({
 
   postStatus: {
     type: String,
+    enum: ["active", "deleted", "drafted"],
     default: "active",
   },
 
@@ -40,7 +41,7 @@ const postSchema = new mongoose.Schema({
   },
 });
 
-postSchema.index({ owner: true });
+postSchema.index({ caption: "text" });
 const Post = mongoose.model("Post", postSchema);
 
 export default Post;

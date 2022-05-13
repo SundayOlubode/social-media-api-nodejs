@@ -888,13 +888,13 @@ export const searchUser = catchAsyncError(async (req, res, next) => {
     {
       $or: [
         {
-          uname: new RegExp(searchText, "gi"),
+          uname: new RegExp(searchText, "i"),
         },
         {
-          fname: new RegExp(searchText, "gi"),
+          fname: new RegExp(searchText, "i"),
         },
         {
-          lname: new RegExp(searchText, "gi"),
+          lname: new RegExp(searchText, "i"),
         },
       ],
     },
