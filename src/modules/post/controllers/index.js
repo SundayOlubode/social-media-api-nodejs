@@ -221,9 +221,6 @@ export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
       $in: [...user.following, user._id],
     },
   })
-    .sort({
-      createdAt: -1,
-    })
     .populate("owner", [
       "_id",
       "fname",
@@ -235,7 +232,10 @@ export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
       "accountType",
       "accountStatus",
       "isVerified",
-    ]);
+    ])
+    .sort({
+      createdAt: -1,
+    });
 
   res.status(200).json({
     success: true,
@@ -247,9 +247,6 @@ export const getFollowingPosts = catchAsyncError(async (req, res, next) => {
 // Get All Posts -- Admin
 export const getAllPosts = catchAsyncError(async (req, res, next) => {
   const posts = await Post.find()
-    .sort({
-      createdAt: -1,
-    })
     .populate("owner", [
       "_id",
       "fname",
@@ -261,7 +258,10 @@ export const getAllPosts = catchAsyncError(async (req, res, next) => {
       "accountType",
       "accountStatus",
       "isVerified",
-    ]);
+    ])
+    .sort({
+      createdAt: -1,
+    });
 
   res.status(200).json({
     success: true,
@@ -363,9 +363,6 @@ export const getAllComments = catchAsyncError(async (req, res, next) => {
   const comments = await Comment.find({
     post: req.query.postId,
   })
-    .sort({
-      createdAt: -1,
-    })
     .populate("user", [
       "_id",
       "fname",
@@ -377,7 +374,10 @@ export const getAllComments = catchAsyncError(async (req, res, next) => {
       "accountType",
       "accountStatus",
       "isVerified",
-    ]);
+    ])
+    .sort({
+      createdAt: -1,
+    });
 
   res.status(200).json({
     success: true,

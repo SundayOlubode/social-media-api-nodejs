@@ -815,18 +815,20 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
 // Get Following User List
 export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.query.id).populate("following", [
-    "_id",
-    "fname",
-    "lname",
-    "email",
-    "uname",
-    "avatar",
-    "profession",
-    "accountType",
-    "accountStatus",
-    "isVerified",
-  ]);
+  const user = await User.findById(req.query.id)
+    .populate("following", [
+      "_id",
+      "fname",
+      "lname",
+      "email",
+      "uname",
+      "avatar",
+      "profession",
+      "accountType",
+      "accountStatus",
+      "isVerified",
+    ])
+    .sort({ uname: 1 });
 
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
@@ -841,18 +843,20 @@ export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
 
 // Get Followers User List
 export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.query.id).populate("followers", [
-    "_id",
-    "fname",
-    "lname",
-    "email",
-    "uname",
-    "avatar",
-    "profession",
-    "accountType",
-    "accountStatus",
-    "isVerified",
-  ]);
+  const user = await User.findById(req.query.id)
+    .populate("followers", [
+      "_id",
+      "fname",
+      "lname",
+      "email",
+      "uname",
+      "avatar",
+      "profession",
+      "accountType",
+      "accountStatus",
+      "isVerified",
+    ])
+    .sort({ uname: 1 });
 
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
@@ -867,22 +871,38 @@ export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
 
 // Search User
 export const searchUser = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.query.id);
-
-  if (!user) {
-    return next(new ErrorHandler("User not found.", 404));
-  }
+  const searchText = req.query.text;
+  const users = await User.find(
+    {
+      $or: [
+        {
+          uname: new RegExp(searchText, "gi"),
+        },
+        {
+          fname: new RegExp(searchText, "gi"),
+        },
+        {
+          lname: new RegExp(searchText, "gi"),
+        },
+      ],
+    },
+    {
+      _id: 1,
+      fname: 1,
+      lname: 1,
+      email: 1,
+      uname: 1,
+      avatar: 1,
+      profession: 1,
+      accountType: 1,
+      accountStatus: 1,
+      isVerified: 1,
+    }
+  );
 
   res.status(200).json({
     success: true,
-    user: {
-      _id: user._id,
-      fname: user.fname,
-      lname: user.lname,
-      email: user.email,
-      uname: user.uname,
-      accountStatus: user.accountStatus,
-    },
+    results: users,
   });
 });
 
