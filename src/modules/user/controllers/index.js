@@ -815,20 +815,26 @@ export const getUserProfileDetails = catchAsyncError(async (req, res, next) => {
 
 // Get Following User List
 export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.query.id)
-    .populate("following", [
-      "_id",
-      "fname",
-      "lname",
-      "email",
-      "uname",
-      "avatar",
-      "profession",
-      "accountType",
-      "accountStatus",
-      "isVerified",
-    ])
-    .sort({ uname: 1 });
+  const user = await User.findById(req.query.id).populate([
+    {
+      path: "following",
+      select: [
+        "_id",
+        "fname",
+        "lname",
+        "email",
+        "uname",
+        "avatar",
+        "profession",
+        "accountType",
+        "accountStatus",
+        "isVerified",
+      ],
+      options: {
+        sort: { uname: 1 },
+      },
+    },
+  ]);
 
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
@@ -843,20 +849,26 @@ export const getFollowingUserList = catchAsyncError(async (req, res, next) => {
 
 // Get Followers User List
 export const getFollowersUserList = catchAsyncError(async (req, res, next) => {
-  const user = await User.findById(req.query.id)
-    .populate("followers", [
-      "_id",
-      "fname",
-      "lname",
-      "email",
-      "uname",
-      "avatar",
-      "profession",
-      "accountType",
-      "accountStatus",
-      "isVerified",
-    ])
-    .sort({ uname: 1 });
+  const user = await User.findById(req.query.id).populate([
+    {
+      path: "followers",
+      select: [
+        "_id",
+        "fname",
+        "lname",
+        "email",
+        "uname",
+        "avatar",
+        "profession",
+        "accountType",
+        "accountStatus",
+        "isVerified",
+      ],
+      options: {
+        sort: { uname: 1 },
+      },
+    },
+  ]);
 
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
