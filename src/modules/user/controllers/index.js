@@ -96,6 +96,8 @@ export const register = catchAsyncError(async (req, res, next) => {
     if (!isUsernameAvailable) {
       return next(new ErrorHandler("Username not available.", 400));
     }
+
+    uname = uname.toLowerCase();
   }
 
   if (password !== confirmPassword) {
@@ -219,6 +221,24 @@ export const getProfileDetails = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id).populate({
     path: "posts",
     model: "Post",
+    populate: [
+      {
+        path: "owner",
+        model: "User",
+        select: [
+          "_id",
+          "fname",
+          "lname",
+          "email",
+          "uname",
+          "avatar",
+          "profession",
+          "accountType",
+          "accountStatus",
+          "isVerified",
+        ],
+      },
+    ],
     options: {
       sort: { createdAt: -1 },
     },
@@ -663,7 +683,9 @@ export const checkUsernameAvailability = catchAsyncError(
       return next(new ErrorHandler("Please enter a valid username.", 400));
     }
 
-    const isUsernameAvailable = await checkUsernameAvailable(uname);
+    const isUsernameAvailable = await checkUsernameAvailable(
+      uname.toLowerCase()
+    );
 
     if (isUsernameAvailable) {
       res.status(200).json({
@@ -697,7 +719,7 @@ export const changeUsername = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (uname) {
-      user.uname = uname;
+      user.uname = uname.toLowerCase();
     }
 
     await user.save();
@@ -888,13 +910,13 @@ export const searchUser = catchAsyncError(async (req, res, next) => {
     {
       $or: [
         {
-          uname: new RegExp(searchText, "i"),
+          uname: new RegExp(searchText, "gi"),
         },
         {
-          fname: new RegExp(searchText, "i"),
+          fname: new RegExp(searchText, "gi"),
         },
         {
-          lname: new RegExp(searchText, "i"),
+          lname: new RegExp(searchText, "gi"),
         },
       ],
     },

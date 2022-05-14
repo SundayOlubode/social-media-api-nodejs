@@ -67,6 +67,14 @@ const userSchema = new mongoose.Schema({
     default: "user",
   },
 
+  location: {
+    type: String,
+  },
+
+  website: {
+    type: String,
+  },
+
   posts: [
     {
       type: mongoose.Types.ObjectId,
