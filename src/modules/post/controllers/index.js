@@ -112,7 +112,7 @@ export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
       refId: post._id,
     });
 
-    if (!notification) {
+    if (!notification || post.owner.toString() !== req.user._id.toString()) {
       await Notification.create({
         owner: post.owner,
         user: req.user._id,
@@ -366,13 +366,15 @@ export const addComment = catchAsyncError(async (req, res, next) => {
 
   post.comments.push(newComment._id);
 
-  await Notification.create({
-    owner: post.owner,
-    user: req.user._id,
-    body: "commented on your post.",
-    refId: post._id,
-    type: "post",
-  });
+  if (post.owner.toString() !== req.user._id.toString()) {
+    await Notification.create({
+      owner: post.owner,
+      user: req.user._id,
+      body: "commented on your post.",
+      refId: post._id,
+      type: "post",
+    });
+  }
 
   await post.save();
 
