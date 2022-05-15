@@ -5,6 +5,7 @@ import ErrorHandler from "../../../helpers/errorHandler.js";
 import Post from "../models/post.js";
 import User from "../../user/models/user.js";
 import Comment from "../models/comment.js";
+import Notification from "../../notifications/models/notification.js";
 
 // Create Post
 export const createPost = catchAsyncError(async (req, res, next) => {
@@ -105,6 +106,21 @@ export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
     });
   } else {
     post.likes.push(req.user._id);
+
+    const notification = await Notification.findOne({
+      user: req.user._id,
+      refId: post._id,
+    });
+
+    if (!notification) {
+      await Notification.create({
+        owner: post.owner,
+        user: req.user._id,
+        body: "liked your post.",
+        refId: post._id,
+        type: "post",
+      });
+    }
 
     await post.save();
 
@@ -349,6 +365,14 @@ export const addComment = catchAsyncError(async (req, res, next) => {
   });
 
   post.comments.push(newComment._id);
+
+  await Notification.create({
+    owner: post.owner,
+    user: req.user._id,
+    body: "commented on your post.",
+    refId: post._id,
+    type: "post",
+  });
 
   await post.save();
 

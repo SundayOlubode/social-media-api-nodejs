@@ -3,27 +3,24 @@ import mongoose from "mongoose";
 const notificationSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Types.ObjectId,
-    ref: "Post",
+    ref: "User",
   },
 
   user: {
     type: mongoose.Types.ObjectId,
-    ref: "Post",
+    ref: "User",
   },
 
   body: {
     type: String,
   },
 
+  refId: String,
+
   type: {
     type: String,
-    enum: ["post", "story", "security", "follower"],
+    enum: ["post", "story", "security", "follow"],
     default: "post",
-  },
-
-  thumbnail: {
-    public_id: String,
-    url: String,
   },
 
   isRead: {
