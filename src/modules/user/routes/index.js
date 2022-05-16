@@ -24,6 +24,8 @@ import {
   getRandomUsers,
   getFollowingUserList,
   getFollowersUserList,
+  saveLoginInfo,
+  getLoginInfo,
 } from "../controllers/index.js";
 import {
   isAuthenticatedUser,
@@ -85,6 +87,10 @@ userRouter
   .get(isAuthenticatedUser, getFollowersUserList);
 
 userRouter.route("/get-random-users").get(isAuthenticatedUser, getRandomUsers);
+
+userRouter.route("/save-login-info").post(isAuthenticatedUser, saveLoginInfo);
+
+userRouter.route("/get-login-info").get(isAuthenticatedUser, getLoginInfo);
 
 // Admin Routes
 userRouter
