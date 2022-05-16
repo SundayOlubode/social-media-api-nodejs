@@ -1027,12 +1027,11 @@ export const saveLoginInfo = catchAsyncError(async (req, res, next) => {
 export const getLoginInfo = catchAsyncError(async (req, res, next) => {
   const user = req.user._id;
 
-  const loginDetails = await LoginDetails.find({ user: user });
+  const loginDetails = await LoginDetails.findOne({ user: user });
 
   res.status(200).json({
     success: true,
-    count: loginDetails.length,
-    results: loginDetails,
+    result: loginDetails,
   });
 });
 
