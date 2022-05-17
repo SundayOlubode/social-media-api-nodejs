@@ -10,6 +10,16 @@ const postSchema = new mongoose.Schema({
     },
   ],
 
+  mediaFiles: [
+    {
+      link: {
+        public_id: String,
+        url: String,
+      },
+      mediaType: String,
+    },
+  ],
+
   owner: {
     type: mongoose.Schema.ObjectId,
     ref: "User",

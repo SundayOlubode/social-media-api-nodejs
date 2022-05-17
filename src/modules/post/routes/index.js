@@ -11,6 +11,7 @@ import {
   getAllPosts,
   likeAndUnlikeComment,
   getAllComments,
+  createDynamicPost,
 } from "../controllers/index.js";
 import {
   isAuthenticatedUser,
@@ -24,6 +25,10 @@ const postRouter = Router();
 postRouter
   .route("/create-post")
   .post(multer.array("images"), isAuthenticatedUser, createPost);
+
+postRouter
+  .route("/create-post-2")
+  .post(multer.array("mediaFiles"), isAuthenticatedUser, createDynamicPost);
 
 postRouter
   .route("/post")

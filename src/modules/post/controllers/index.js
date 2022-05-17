@@ -85,6 +85,130 @@ export const createPost = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// Create Post
+export const createDynamicPost = catchAsyncError(async (req, res, next) => {
+  const mediaFiles = req.files;
+
+  if (!mediaFiles || mediaFiles?.length <= 0) {
+    return next(
+      new ErrorHandler("Please provide atleast one post image or video.", 400)
+    );
+  }
+
+  for (let i = 0; i < mediaFiles.length; i++) {
+    let tempFile = mediaFiles[i];
+
+    const fileSize = tempFile.size / 1024;
+
+    if (tempFile.mimetype === "video/mp4") {
+      if (fileSize > 30 * 1024) {
+        return next(
+          new ErrorHandler("Video size must be lower than 30mb.", 413)
+        );
+      }
+    } else {
+      if (fileSize > 2048) {
+        return next(
+          new ErrorHandler("Image size must be lower than 2mb.", 413)
+        );
+      }
+    }
+  }
+
+  let mediaFilesLinks = [];
+
+  for (let i = 0; i < mediaFiles.length; i++) {
+    let fileTempPath = mediaFiles[i].path;
+    let fileMimeType = mediaFiles[i].mimetype;
+
+    if (fileMimeType === "video/mp4") {
+      await cloudinary.v2.uploader
+        .upload(fileTempPath, {
+          folder: "social_media_api/posts/videos",
+          resource_type: "video",
+          chunk_size: 6000000,
+        })
+        .then(async (result) => {
+          mediaFilesLinks.push({
+            link: {
+              public_id: result.public_id,
+              url: result.secure_url,
+            },
+            mediaType: "video",
+          });
+
+          fs.unlink(fileTempPath, (err) => {
+            if (err) console.log(err);
+          });
+        })
+        .catch((err) => {
+          fs.unlink(fileTempPath, (fileErr) => {
+            if (fileErr) console.log(fileErr);
+          });
+
+          console.log(err);
+
+          res.status(400).json({
+            success: false,
+            message: "An error occurred in uploading image to server.",
+          });
+        });
+    } else {
+      await cloudinary.v2.uploader
+        .upload(fileTempPath, {
+          folder: "social_media_api/posts/images",
+        })
+        .then(async (result) => {
+          mediaFilesLinks.push({
+            link: {
+              public_id: result.public_id,
+              url: result.secure_url,
+            },
+            mediaType: "image",
+          });
+
+          fs.unlink(fileTempPath, (err) => {
+            if (err) console.log(err);
+          });
+        })
+        .catch((err) => {
+          fs.unlink(fileTempPath, (fileErr) => {
+            if (fileErr) console.log(fileErr);
+          });
+
+          console.log(err);
+
+          res.status(400).json({
+            success: false,
+            message: "An error occurred in uploading image to server.",
+          });
+        });
+    }
+  }
+
+  // console.log(mediaFilesLinks);
+
+  const newPost = {
+    caption: req.body.caption,
+    owner: req.user._id,
+  };
+
+  newPost.mediaFiles = mediaFilesLinks;
+
+  const post = await Post.create(newPost);
+
+  const user = await User.findById(req.user._id);
+
+  user.posts.push(post._id);
+
+  await user.save();
+
+  res.status(201).json({
+    success: true,
+    message: "Post created.",
+  });
+});
+
 // Like/Unlike Post
 export const likeAndUnlikePost = catchAsyncError(async (req, res, next) => {
   const post = await Post.findById(req.query.id);
