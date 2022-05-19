@@ -24,7 +24,7 @@ const postRouter = Router();
 // Routes
 postRouter
   .route("/create-post")
-  .post(multer.array("images"), isAuthenticatedUser, createDynamicPost);
+  .post(multer.array("mediaFiles"), isAuthenticatedUser, createDynamicPost);
 
 // postRouter
 //   .route("/create-post-2")
