@@ -1,5 +1,6 @@
 import cloudinary from "cloudinary";
 import fs from "fs";
+import path from "path";
 import catchAsyncError from "../../../helpers/catchAsyncError.js";
 import ErrorHandler from "../../../helpers/errorHandler.js";
 import Post from "../models/post.js";
