@@ -88,6 +88,7 @@ export const createPost = catchAsyncError(async (req, res, next) => {
 // Create Post
 export const createDynamicPost = catchAsyncError(async (req, res, next) => {
   const mediaFiles = req.files;
+  const videoFilesTypes = [".mp4", ".mkv"];
 
   if (!mediaFiles || mediaFiles?.length <= 0) {
     return next(
@@ -99,8 +100,9 @@ export const createDynamicPost = catchAsyncError(async (req, res, next) => {
     let tempFile = mediaFiles[i];
 
     const fileSize = tempFile.size / 1024;
+    let ext = path.extname(tempFile.originalname);
 
-    if (tempFile.mimetype === "video/mp4") {
+    if (videoFilesTypes.includes(ext)) {
       if (fileSize > 30 * 1024) {
         return next(
           new ErrorHandler("Video size must be lower than 30mb.", 413)
@@ -119,9 +121,9 @@ export const createDynamicPost = catchAsyncError(async (req, res, next) => {
 
   for (let i = 0; i < mediaFiles.length; i++) {
     let fileTempPath = mediaFiles[i].path;
-    let fileMimeType = mediaFiles[i].mimetype;
+    let fileExt = path.extname(mediaFiles[i].originalname);
 
-    if (fileMimeType === "video/mp4") {
+    if (videoFilesTypes.includes(fileExt)) {
       await cloudinary.v2.uploader
         .upload(fileTempPath, {
           folder: "social_media_api/posts/videos",

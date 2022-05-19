@@ -8,7 +8,7 @@ const multerStorage = multer.diskStorage({
   },
 });
 
-const whiteListMediaTypes = ["png", "jpeg", "jpg", "mp4", "mkv"];
+const whiteListMediaTypes = [".png", ".jpeg", ".jpg", ".mp4", ".mkv"];
 
 const fileFilter = (req, file, cb) => {
   let ext = path.extname(file.originalname);
