@@ -8,15 +8,11 @@ const multerStorage = multer.diskStorage({
   },
 });
 
-const whiteListMediaTypes = [
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "video/mp4",
-];
+const whiteListMediaTypes = ["png", "jpeg", "jpg", "mp4", "mkv"];
 
 const fileFilter = (req, file, cb) => {
-  if (!whiteListMediaTypes.includes(file.mimetype)) {
+  let ext = path.extname(file.originalname);
+  if (!whiteListMediaTypes.includes(ext)) {
     cb({ message: "Unsupported file format" }, false);
     return;
   }
