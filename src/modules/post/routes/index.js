@@ -24,11 +24,11 @@ const postRouter = Router();
 // Routes
 postRouter
   .route("/create-post")
-  .post(multer.array("images"), isAuthenticatedUser, createPost);
+  .post(multer.array("images"), isAuthenticatedUser, createDynamicPost);
 
-postRouter
-  .route("/create-post-2")
-  .post(multer.array("mediaFiles"), isAuthenticatedUser, createDynamicPost);
+// postRouter
+//   .route("/create-post-2")
+//   .post(multer.array("mediaFiles"), isAuthenticatedUser, createDynamicPost);
 
 postRouter
   .route("/post")
