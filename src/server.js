@@ -23,7 +23,11 @@ const app = runApp();
   });
 
   // Connecting to DB
-  await databse.connect();
+  try {
+    await databse.connect();
+  } catch (err) {
+    process.exit(1);
+  }
 
   // Init Modules
   initModules(app);

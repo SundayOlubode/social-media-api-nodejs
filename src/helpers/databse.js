@@ -12,6 +12,7 @@ const databse = {
       console.log(`[database]: connected successfully to MongoDB`);
     } catch (err) {
       console.log(`[database]: could not connect due to [${err.message}]`);
+      throw err;
     }
   },
 };
